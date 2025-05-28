@@ -1,0 +1,196 @@
+---
+title: "Difference-in-Differences II: Generalised DiD"
+subtitle: "Lecture 4 - Introduction to Causal Inference"
+author: "Kevin Li"
+format:
+  beamer:
+    slide-number: true
+header-includes: |
+  \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
+  \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
+editor: visual
+---
+
+## More Time Periods
+
+In Classical DiD, we have two time periods: $t = -1$ (pre-treatment) and $t=0$ (post-treatment).
+
+In Generalised DiD, we allow for more time periods.
+
+-   Multiple Pre-treatment periods $t = -1, -2, -3, \dots$.
+
+-   Multiple Post-treatment periods $t = 0, 1, 2, 3, \dots$.
+
+For example, instead of only having data in March 1992 and December 1992 around the adoption of the new minimum wage in April 1992, we could also have:
+
+-   Data from 1991, 1990, 1989, etc. from before the treatment
+
+-   Data from 1993, 1994, etc. after the treatment.
+
+## Dynamic Treatment Effects
+
+We can still estimate an overall $\tau_\text{ATT}$ like in classical DiD. But we can also estimate causal effects for each individual post-treatment time-period $t= 0, 1, 2, \dots$.
+
+```{r}
+#| warning: false
+#| message: false
+#| fig-height: 3.5
+#| fig-align: center
+
+library(fixest)
+data(base_stagg, package = "fixest")
+df <- base_stagg
+colnames(df) <- c("unit", "time", "cohort", "rel.time", "treated", "te", "covar", "outcome")
+df$treat <- ifelse(df$rel.time >= 0, 1, 0)
+
+dynamic <- feols(
+  fml   = outcome ~ i(rel.time, ref = c(-1, -1000)) + covar | unit + time,
+  # Do not change -1 in c(). You change -1000 to the value of never-treated for rel.time
+  
+  data  = df,     # your data
+  vcov  = ~unit   # cluster SE by unit
+)
+
+library(ggfixest)
+
+plot <- ggiplot(
+  # required options
+  object   = dynamic,           # input your dynamic model object
+  ref.line = FALSE,             # we will add our own line later
+  
+  # optional aesthetic options
+  xlab     = "Time Period (First treatment starts t=0)",  # x-axis label
+  ylab     = "Dynamic Effect",        # y-axis label
+  main = ""
+)
+
+plot +
+  # select how many period to display
+  xlim(-1, 8) +
+  
+  # add reference lines for treatment beginning and 0 causal effect
+  geom_vline(xintercept = -0.5, linetype = 3) +
+  geom_hline(yintercept = 0, linetype = 3, color = "red") +
+  theme_bw() +
+  theme(
+    axis.title.x = element_text(size = 16),  # Increase x-axis title size
+    axis.title.y = element_text(size = 16),  # Increase y-axis title size
+    axis.text.x = element_text(size = 16),   # Increase x-axis tick label size
+    axis.text.y = element_text(size = 16),  # Increase y-axis tick label size
+    legend.title = element_text(size = 16),  # Increase legend title size
+    legend.text = element_text(size = 14)    # Increase legend text (labels) size
+  )
+
+```
+
+This allows us to see how the effect of treatment evolves over time.
+
+-   You can see treatment starts negative in earlier post-treatment periods, before becoming more positive over time.
+
+## Pre-Treatment Effects
+
+We can also calculate estimated effects for pre-treatment periods $t=-1, -2, \dots$. These test the **parallel trends assumption**.
+
+-   If the estimate is not equal to 0, or close to 0, that is evidence the parallel trends assumption is violated.
+
+```{r}
+#| warning: false
+#| message: false
+#| fig-height: 3.5
+#| fig-align: center
+
+plot +
+  # select how many period to display
+  xlim(-8, 0) +
+  
+  # add reference lines for treatment beginning and 0 causal effect
+  geom_vline(xintercept = -0.5, linetype = 3) +
+  geom_hline(yintercept = 0, linetype = 3, color = "red") +
+  theme_bw() +
+  theme(
+    axis.title.x = element_text(size = 16),  # Increase x-axis title size
+    axis.title.y = element_text(size = 16),  # Increase y-axis title size
+    axis.text.x = element_text(size = 16),   # Increase x-axis tick label size
+    axis.text.y = element_text(size = 16),  # Increase y-axis tick label size
+    legend.title = element_text(size = 16),  # Increase legend title size
+    legend.text = element_text(size = 14)    # Increase legend text (labels) size
+  )
+```
+
+We don't need all periods to be estimates of 0 for parallel trends. But at least period $t=-1, -2, -3$ is ideal (a trend requires multiple periods).
+
+## Conditional Parallel Trends
+
+Let us say we calculate pre-treatment effects (like on the last slide), and find evidence that parallel trends is violated.
+
+Generalised DiD allows us to **control/condition** for potential variables that cause violations in parallel trends.
+
+-   Let us say we have some variable $X$, that is correlated with $Y$. If the trend of $X$ values in the treated group and control group are different, it is likely that the trend in $Y$ between the treated group and control group is different.
+
+-   Thus, we would want to condition on $X$ - i.e. holding $X$ constant, parallel trends is met.
+
+This allows us to apply Generalised DiD to more situations than classical DiD.
+
+## Types of Data
+
+Before we start discussing estimators, we need to distinguish the type of data we have.
+
+-   **Panel Data**: This is data that observes the same individuals over multiple time periods. For example, in the New Jersey DiD example, panel data would be if we observe the same restaurants in the pre-treatment and post-treatment periods.
+
+-   **Repeated Cross-Sections**: This is data that observes **different** individuals over multiple time periods. For example, in the New Jersey DiD example, repeated cross-section would be if we randomly sampled restaurants from the state in the pre-treatment and post-treatment periods. Any specific restaurant might not appear in all periods.
+
+## Two-Way Fixed Effects (Panel Data)
+
+The estimator for Generalised DiD is the two-way fixed effects (TWFE) estimator. It is a linear regression:
+
+$$
+\hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + D_{it}\hat\tau_\text{ATT} + \mathbf X_{it}^\top \hat{\pmb\beta}
+$$
+
+-   $\mathbf X_{it}^\top$ are the values of the variables we are using to condition for parallel trends. This is optional (only use if parallel trends is not met without them).
+
+-   $\hat\alpha_i$ and $\hat\gamma_t$ are unit and time fixed effects.
+
+The estimated $\hat\tau_\text{ATT}$ from the regression is the overall causal estimate for all post-treatment periods.
+
+-   Standard errors should be clustered by units.
+
+## What are Fixed Effects
+
+Unit fixed effects $\hat\alpha_i$ are intercepts in regression, like $\beta_0$. However, each unit $i$ gets its own intercept value.
+
+-   These account for differences between units. Think of them as a control variable for units.
+
+Time fixed effects $\hat\gamma_t$ are the same, but for time periods $t$. These account for differences between time periods.
+
+The only remaining potential confounders is differences in trends over time between units. But if we meet the parallel trends assumption, this is also controlled for.
+
+Thus, all confounders are controlled for, and thus, treatment $D_{it}$ is exogenous. Thus, we can find the causal effect with TWFE.
+
+## TWFE for Dynamic Treatment Effects
+
+We can also use two-way fixed effects to estimate dynamic treatment effects (post-treatment) and pre-treatment estimates.
+
+$$
+\hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + T_t \hat\tau_t + \mathbf X_{it}^\top \hat{\pmb\beta}
+$$
+
+-   $T_t$ is a **categorical** time variable, indicating the period of time for the observation. $t=-1$ is set as the reference category.
+
+-   It should be adjusted such that $t=0$ is the first year of treatment, $t ≥ 0$ are post-treatment periods, and $t ≤ -1$ are pre-treatment periods.
+
+$\hat\tau_t$ are dynamic treatment effects for each time period $t$ **except** period $-1$. We base our parallel trends off of the last pre-treatment period $-1$, so the causal estimate is assumed to be 0.
+
+## Repeated Cross-Section Data
+
+For repeated cross-section data, we replace the unit fixed effect $\hat\alpha_i$ with a group fixed effect.
+
+-   The group should be the level of treatment assignment.
+
+For example, let us say we are studying how states lowering income taxes affects voter turnout.
+
+-   We have random samples of individuals from each state, in each time period.
+
+-   Since treatment is assigned at the state level (state income tax), we should use state fixed effects.
+
+Standard errors should be clustered by group, not units.

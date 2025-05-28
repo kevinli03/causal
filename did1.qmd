@@ -168,47 +168,27 @@ plot2
 
 The example we just showed is an example of classical difference-in-differences. We have 2 groups of observations:
 
--   A treated group $G= 1$. These are units that will receive treatment sometime in our study (like New Jersey).
+-   A treated group $G= 1$. These are units that will receive treatment sometime in our study (like restaurants in New Jersey).
 
 -   An untreated group $G = 0$. These are units that will not receive treatment (like Pennsylvania).
 
 We have 2 time periods.
 
--   In $t=0$ (pre-treatment), both groups are untreated.
+-   In $t=-1$ (pre-treatment), both groups are untreated.
 
--   In $t=1$ (post-treatment), only the treated group is treated, while the control group remains untreated.
+-   In $t=0$ (post-treatment), only the treated group is treated, while the control group remains untreated.
 
 ## Estimating Causal Effects
 
-The trend in the untreated group $G=0$ between time periods is:
+The DiD estimate for the causal effect is:
 
 $$
-\text{trend} = \overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}
-$$
-
-The estimated counterfactual for the treated group is thus:
-
-$$
-\overline Y^{(G=1)}_{t=0} + (\text{trend}) \ =\ \overline Y^{(G=1)}_{t=0} + \left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right)
-$$
-
-The estimated causal effect is thus:
-
-$$
-\tau_\text{ATT} = \overline Y^{(G=1)}_{t=1} - \underbrace{\left [\overline Y^{(G=1)}_{t=0} + \left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right) \right]}_\text{estimated counterfactual}
-$$
-
-## Why is it Called Difference-in-Differences?
-
-Distribute out the negative sign, and you get:
-
-$$
-\tau_\text{ATT} = \underbrace{\left(\overline Y^{(G=1)}_{t=1} - \overline Y^{(G=1)}_{t=0}\right)}_{\Delta \text{ for } G=1} - \underbrace{\left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right)}_{\Delta \text{ for } G=0} 
+\hat\tau_\text{ATT} = \underbrace{\left(\overline Y^{(G=1)}_{t=0} - \overline Y^{(G=1)}_{t=-1}\right)}_\text{Diff. for treated group} - \underbrace{\left(\overline Y^{(G=0)}_{t=0} - \overline Y^{(G=0)}_{t=-1}\right)}_\text{Diff. for control group} 
 $$
 
 -   The first part is the difference in average $Y$ between time periods for the treated group $G=1$.
 
--   The second part is the difference in average $Y$ between time periods for the control group $G=0$.
+-   The second part is the difference in average $Y$ between time periods for the control group $G=0$. This accounts for the trend in the control unit.
 
 The total causal effect is the difference of these two differences. Hence, difference-in-differences.
 
@@ -220,13 +200,13 @@ $$
 \hat Y_{it} = \hat\alpha +  G_i\hat \gamma +  T_{it}\hat\delta + G_iT_{it} \hat\tau_\text{ATT}
 $$
 
--   $G_{i}$ is the variable indicating the group for the unit (treated, control)
+-   $G_{i}$ is the binary variable indicating the group for the unit (treated, control)
 
--   $T_{it}$ is the variable indicating the time period for the observation.
+-   $T_{it}$ is the binary variable indicating the time period for the observation.
+
+The estimate of $\hat\tau_\text{ATT}$ is our DiD estimate of the causal effect. It will be equal to the estimate from the equation on the last side.
 
 -   Standard errors should be clustered at the group $G_i$ level.
-
-(You can confirm this is equal to the previous DiD estimator - plug in the correct values for $G_i$ and $T_{it}$ for each $\overline Y^{(G=G_i)}_{t=T_{it}}$ in the previous equation for DiD).
 
 ## Parallel Trends Assumption
 

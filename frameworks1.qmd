@@ -194,7 +194,7 @@ Downside: we have to be able to control who gets treatment and who does not, so 
 We can also achieve exogeneity if we include every single possible confounder in our regression with our treatment:
 
 $$
-Y_i = \alpha + D_i\tau + \mathbf X_{i}^\top\boldsymbol\beta + \varepsilon_i
+Y_i = \alpha + D_i\tau + \mathbf X_{i}^\top\pmb\beta + \varepsilon_i
 $$
 
 -   Where $\mathbf X_i$ is a vector of values for all confounders for unit $i$.
