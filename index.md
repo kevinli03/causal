@@ -35,7 +35,7 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 
 *In this lecture, I introduce the classical 2-period Difference-in-Differences design used for causal identification, and the parallel trends assumption*.
 
-Lecture Slides
+[Lecture Slides](https://kevinli03.github.io/causal/did1.pdf)
 
 #### 4. Difference-in-Differences II: Generalised DiD
 
@@ -49,33 +49,21 @@ Lecture Slides
 
 Lecture Slides
 
-#### 6. Instrumental Variables I: Intuition and Estimation
-
-*In this lecture, I introduce the intuition behind instrumental variables, and discuss the two-stage least squares estimator*.
-
-Lecture Slides
-
-#### 7. Instrumental Variables II: Research Designs
-
-*In this lecture, I introduce the non-compliance research design and examiner instruments research design*.
-
-Lecture Slides
-
-#### 8. Regression Discontinuity I: Sharp Discontinuity
+#### 6. Regression Discontinuity Design
 
 *In this lecture, I introduce the regression discontinuity design and its sharp variant, as well as the key identification assumptions and design of RDD*.
 
 Lecture Slides
 
-#### 9. Regression Discontinuity II:  Extensions
+#### 7. Instrumental Variables Design
 
-*In this lecture, I expand on RDD to discuss fuzzy discontinuity designs and regression kink designs*.
+*In this lecture, I introduce the intuition behind instrumental variables, and discuss the two-stage least squares estimator*.
 
 Lecture Slides
 
-#### 10. Matching Designs
+#### 8. Selection on Observables
 
-*In this lecture, I discuss matching and matching-inspired designs, such as distance matching, propensity score matching, genetic matching, and regression*.
+*In this lecture, I discuss matching designs, such as distance matching, propensity score matching, and genetic matching.*
 
 Lecture Slides
 

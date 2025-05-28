@@ -1,0 +1,302 @@
+---
+title: "Difference-in-Differences I: Classical DiD"
+subtitle: "Lecture 3 - Introduction to Causal Inference"
+author: "Kevin Li"
+format:
+  beamer:
+    slide-number: true
+header-includes: |
+  \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
+  \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
+editor: visual
+---
+
+## New Jersey Employment
+
+New Jersey implemented a minimum wage increase in April 1992. We want to find the causal effect of this on employment in fast food restaurants.
+
+We have average data of all restaurant's employment rate from before and after the change.
+
+```{r}
+#| fig-height: 4
+#| warning: false
+#| message: false
+#| fig-align: center
+
+library(tidyverse)
+df.nj <- data.frame(
+  time = c(0, 1),
+  nj = c(20, 24)
+)
+
+df.pa <- data.frame(
+  time = c(0, 1),
+  pa = c(18, 19)
+)
+
+df.pot <- data.frame(
+  time = c(0, 1),
+  nj.pot = c(20, 21)
+)
+
+plot1 <- ggplot() +
+  geom_point(aes(x = time, y = nj, color = "col2"), data = df.nj) +
+  geom_line(aes(x = time, y = nj, color = "col2"), data = df.nj) +
+  scale_color_manual(
+    name = "Legend",
+    values = c("col2" = "darkgreen"),
+    labels = c("New Jersey")
+  ) +
+  theme_bw() +
+  scale_x_continuous(breaks = c(0, 1), labels = c("Mar 1992","Dec 1992")) +
+  xlab(NULL) + ylab("Employment Rate (Y)") +
+  ylim(17, 27) + 
+  theme(
+    axis.title.x = element_text(size = 14),  # Increase x-axis title size
+    axis.title.y = element_text(size = 18),  # Increase y-axis title size
+    axis.text.x = element_text(size = 16),   # Increase x-axis tick label size
+    axis.text.y = element_text(size = 16),  # Increase y-axis tick label size
+    legend.title = element_text(size = 16),  # Increase legend title size
+    legend.text = element_text(size = 14)    # Increase legend text (labels) size
+  )
+
+plot1
+```
+
+## Our Issue
+
+Is our causal effect the Dec 1992 - Mar 1992? No!
+
+Why? Something could have happened between March and December, like a recession or something else.
+
+-   How do we know if those factors are explaining the change in employment, or our treatment?
+
+```{r}
+#| fig-height: 4
+#| warning: false
+#| message: false
+#| fig-align: center
+
+plot1
+
+```
+
+## Our Issue in Potential Outcomes
+
+We can also think of this issue in terms of potential outcomes. Our causal effect in December 1992 is:
+
+$$
+\text{Average }\tau_\text{Dec} = \overline Y_\text{Dec}(1) - \overline Y_\text{Dec}(0)
+$$
+
+But we do not observe $\overline Y_\text{Dec}(0)$ since New Jersey is treated in Dec.
+
+```{r}
+#| fig-height: 4
+#| warning: false
+#| message: false
+#| fig-align: center
+
+plot1
+```
+
+## Solution: Trend in Control Group
+
+What if we looked at another state who did not have a minimum wage increase during this time, such as Pennsylvania?
+
+Pennsylvania tells us the **trend** in employment $Y$ if no treatment occurred.
+
+```{r}
+#| fig-height: 4
+#| warning: false
+#| message: false
+#| fig-align: center
+
+ggplot() +
+  geom_point(aes(x = time, y = nj, color = "col2"), data = df.nj) +
+  geom_line(aes(x = time, y = nj, color = "col2"), data = df.nj) +
+  geom_point(aes(x = time, y = pa, color = "col1"), data = df.pa) +
+  geom_line(aes(x = time, y = pa, color = "col1"), data = df.pa) +
+  scale_color_manual(
+    name = "Legend",
+    values = c("col1" = "red",
+               "col2" = "darkgreen"),
+    labels = c("Pennsylvania", "New Jersey")
+  ) +
+  theme_bw() +
+  scale_x_continuous(breaks = c(0, 1), labels = c("Mar 1992","Dec 1992")) +
+  xlab(NULL) + ylab("Employment Rate") +
+  ylim(17, 27) +
+  theme(
+    axis.title.x = element_text(size = 14),  # Increase x-axis title size
+    axis.title.y = element_text(size = 18),  # Increase y-axis title size
+    axis.text.x = element_text(size = 16),   # Increase x-axis tick label size
+    axis.text.y = element_text(size = 16),  # Increase y-axis tick label size
+    legend.title = element_text(size = 16),  # Increase legend title size
+    legend.text = element_text(size = 14)    # Increase legend text (labels) size
+  )
+```
+
+## Solution: Parallel Trends
+
+Then, we assume that if New Jersey had hypothetically not received a minimum wage increase, it would have followed the same trend as Pennsylvania.
+
+-   This allows us to estimate New Jersey's counterfactual, and find New Jersey's causal effect in December.
+
+```{r}
+#| fig-height: 4
+#| warning: false
+#| message: false
+#| fig-align: center
+
+df.att <- data.frame(
+  time = c(1, 1),
+  att = c(23.9, 21.1)
+)
+plot2 <- ggplot() +
+  geom_point(aes(x = time, y = nj.pot, color = "col3"), data = df.pot) +
+  geom_line(aes(x = time, y = nj.pot, color = "col3"), data = df.pot, linetype = 2) +
+  geom_point(aes(x = time, y = nj, color = "col2"), data = df.nj) +
+  geom_line(aes(x = time, y = nj, color = "col2"), data = df.nj) +
+  geom_point(aes(x = time, y = pa, color = "col1"), data = df.pa) +
+  geom_line(aes(x = time, y = pa, color = "col1"), data = df.pa) +
+  geom_line(aes(x = time, y = att, color = "col4"), data = df.att, arrow = arrow(length = unit(0.2, "cm"), ends = "both", type = "closed"), linetype = 3) +
+  scale_color_manual(
+    name = "Legend",
+    values = c("col1" = "red",
+               "col2" = "darkgreen",
+               "col3" = "purple",
+               "col4" = "black"),
+    labels = c("Pennsylvania", "New Jersey", "New Jersey (Counterfactual)", "Treatment Effect")
+  ) +
+  theme_bw() +
+  scale_x_continuous(breaks = c(0, 1), labels = c("Mar 1992","Dec 1992")) +
+  xlab(NULL) + ylab("Employment Rate") +
+  ylim(17, 27) +
+  theme(
+    axis.title.x = element_text(size = 14),  # Increase x-axis title size
+    axis.title.y = element_text(size = 18),  # Increase y-axis title size
+    axis.text.x = element_text(size = 16),   # Increase x-axis tick label size
+    axis.text.y = element_text(size = 16),  # Increase y-axis tick label size
+    legend.title = element_text(size = 16),  # Increase legend title size
+    legend.text = element_text(size = 14)    # Increase legend text (labels) size
+  )
+
+plot2
+```
+
+## Classical DiD
+
+The example we just showed is an example of classical difference-in-differences. We have 2 groups of observations:
+
+-   A treated group $G= 1$. These are units that will receive treatment sometime in our study (like New Jersey).
+
+-   An untreated group $G = 0$. These are units that will not receive treatment (like Pennsylvania).
+
+We have 2 time periods.
+
+-   In $t=0$ (pre-treatment), both groups are untreated.
+
+-   In $t=1$ (post-treatment), only the treated group is treated, while the control group remains untreated.
+
+## Estimating Causal Effects
+
+The trend in the untreated group $G=0$ between time periods is:
+
+$$
+\text{trend} = \overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}
+$$
+
+The estimated counterfactual for the treated group is thus:
+
+$$
+\overline Y^{(G=1)}_{t=0} + (\text{trend}) = \overline Y^{(G=1)}_{t=1} + \left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right)
+$$
+
+The estimated causal effect is thus:
+
+$$
+\tau_\text{ATT} = \overline Y^{(G=1)}_{t=0} - \underbrace{\left [\overline Y^{(G=1)}_{t=1} + \left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right) \right]}_\text{estimated counterfactual}
+$$
+
+## Why is it Called Difference-in-Differences?
+
+Distribute out the negative sign, and you get:
+
+$$
+\tau_\text{ATT} = \underbrace{\left(\overline Y^{(G=1)}_{t=0} - \overline Y^{(G=1)}_{t=1}\right)}_{\Delta \text{ for } G=1} - \underbrace{\left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right)}_{\Delta \text{ for } G=0} 
+$$
+
+-   The first part is the difference in average $Y$ between time periods for the treated group $G=1$
+
+-   The second part is the difference in average $Y$ between time periods for the control group $G=0$.
+
+The total causal effect is the difference of these two differences.
+
+## Parallel Trends Assumption
+
+The causal estimate $\tau_\text{ATT}$ is only accurate if the parallel trends assumption is met.
+
+-   That if the treated group had really been untreated, it would have followed the same trend as the control group.
+
+```{r}
+#| fig-height: 4
+#| warning: false
+#| message: false
+#| fig-align: center
+
+plot2
+```
+
+## Example of Violating Parallel Trends
+
+Here, we can see the true counterfactual of New Jersey is not the same trend as Pennsylvania. So if we assumed the parallel trends assumption, our causal estimate would be very wrong.
+
+```{r}
+#| fig-height: 4
+#| warning: false
+#| message: false
+#| fig-align: center
+
+df.pt1 <- data.frame(
+  time = c(0, 1),
+  nj.pot = c(20, 16)
+)
+
+df.att <- data.frame(
+  time = c(1, 1),
+  att = c(23.9, 16.1)
+)
+
+ggplot() +
+  geom_point(aes(x = time, y = nj.pot, color = "col3"), data = df.pot) +
+  geom_line(aes(x = time, y = nj.pot, color = "col3"), data = df.pot, linetype = 2) +
+  geom_point(aes(x = time, y = nj.pot, color = "col4"), data = df.pt1) +
+  geom_line(aes(x = time, y = nj.pot, color = "col4"), data = df.pt1) +
+  geom_point(aes(x = time, y = nj, color = "col2"), data = df.nj) +
+  geom_line(aes(x = time, y = nj, color = "col2"), data = df.nj) +
+  geom_point(aes(x = time, y = pa, color = "col1"), data = df.pa) +
+  geom_line(aes(x = time, y = pa, color = "col1"), data = df.pa) +
+  geom_line(aes(x = time, y = att, color = "col5"), data = df.att, arrow = arrow(length = unit(0.2, "cm"), ends = "both", type = "closed"), linetype = 3) +
+  scale_color_manual(
+    name = "Legend",
+    values = c("col1" = "red",
+               "col2" = "darkgreen",
+               "col3" = "purple",
+               "col4" = "purple",
+               "col5" = "black"),
+    labels = c("Pennsylvania", "New Jersey", "New Jersey (Parallel Trends)", "New Jersey (Real Counterfactual)", "Treatment Effect")
+  ) +
+  theme_bw() +
+  scale_x_continuous(breaks = c(0, 1), labels = c("Mar 1992","Dec 1992")) +
+  xlab(NULL) + ylab("Employment Rate") +
+  ylim(15, 27) +
+  theme(
+    axis.title.x = element_text(size = 14),  # Increase x-axis title size
+    axis.title.y = element_text(size = 18),  # Increase y-axis title size
+    axis.text.x = element_text(size = 16),   # Increase x-axis tick label size
+    axis.text.y = element_text(size = 16),  # Increase y-axis tick label size
+    legend.title = element_text(size = 16),  # Increase legend title size
+    legend.text = element_text(size = 14)    # Increase legend text (labels) size
+  )
+```
