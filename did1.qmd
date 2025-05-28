@@ -210,13 +210,13 @@ $$
 The estimated counterfactual for the treated group is thus:
 
 $$
-\overline Y^{(G=1)}_{t=0} + (\text{trend}) = \overline Y^{(G=1)}_{t=1} + \left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right)
+\overline Y^{(G=1)}_{t=0} + (\text{trend}) = \overline Y^{(G=1)}_{t=0} + \left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right)
 $$
 
 The estimated causal effect is thus:
 
 $$
-\tau_\text{ATT} = \overline Y^{(G=1)}_{t=0} - \underbrace{\left [\overline Y^{(G=1)}_{t=1} + \left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right) \right]}_\text{estimated counterfactual}
+\tau_\text{ATT} = \overline Y^{(G=1)}_{t=1} - \underbrace{\left [\overline Y^{(G=1)}_{t=0} + \left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right) \right]}_\text{estimated counterfactual}
 $$
 
 ## Why is it Called Difference-in-Differences?
@@ -224,20 +224,21 @@ $$
 Distribute out the negative sign, and you get:
 
 $$
-\tau_\text{ATT} = \underbrace{\left(\overline Y^{(G=1)}_{t=0} - \overline Y^{(G=1)}_{t=1}\right)}_{\Delta \text{ for } G=1} - \underbrace{\left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right)}_{\Delta \text{ for } G=0} 
+\tau_\text{ATT} = \underbrace{\left(\overline Y^{(G=1)}_{t=1} - \overline Y^{(G=1)}_{t=0}\right)}_{\Delta \text{ for } G=1} - \underbrace{\left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right)}_{\Delta \text{ for } G=0} 
 $$
 
--   The first part is the difference in average $Y$ between time periods for the treated group $G=1$
+-   The first part is the difference in average $Y$ between time periods for the treated group $G=1$.
 
 -   The second part is the difference in average $Y$ between time periods for the control group $G=0$.
 
-The total causal effect is the difference of these two differences.
+The total causal effect is the difference of these two differences. Hence, difference-in-differences.
 
 ## Parallel Trends Assumption
 
-The causal estimate $\tau_\text{ATT}$ is only accurate if the parallel trends assumption is met.
+DiD depends on the parallel trends assumption.
 
 -   That if the treated group had really been untreated, it would have followed the same trend as the control group.
+-   Ex: New Jersey, if it had no minimum wage rise, would have followed the same trend in employment as Pennsylvania.
 
 ```{r}
 #| fig-height: 4
@@ -285,7 +286,7 @@ ggplot() +
                "col3" = "purple",
                "col4" = "purple",
                "col5" = "black"),
-    labels = c("Pennsylvania", "New Jersey", "New Jersey (Parallel Trends)", "New Jersey (Real Counterfactual)", "Treatment Effect")
+    labels = c("Pennsylvania", "New Jersey", "New Jersey (Parallel Trends)", "New Jersey (Real Counterfactual)", "Real Treatment Effect")
   ) +
   theme_bw() +
   scale_x_continuous(breaks = c(0, 1), labels = c("Mar 1992","Dec 1992")) +
