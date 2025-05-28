@@ -1,0 +1,225 @@
+---
+title: "Causal Frameworks I: Exogeneity"
+subtitle: "Lecture 1 - Introduction to Causal Inference"
+author: "Kevin Li"
+format:
+  beamer:
+    slide-number: true
+header-includes: |
+  \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
+  \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
+editor: visual
+---
+
+## What is Causal Inference?
+
+In causal inference, we are interested in how treatment $D$ affects outcome $Y$.
+
+```{dot}
+//| fig-width: 3.5
+//| fig-height: 0.4
+digraph example1 {
+  bgcolor="transparent";
+  // Nodes
+  D [shape=box, label="Treatment (D)"]
+  Y [shape=box, label="Outcome (Y)"]
+
+  // Edges
+  D -> Y [label="Causal Effect"]
+
+  // Graph styling
+  rankdir=LR; // Left to right layout
+}
+```
+
+We generally assume that treatment $D$ is binary:
+
+$$
+D_i =\begin{cases}
+1 & \text{if individual }i \text{ gets the treatment (treated)} \\
+1 & \text{if individual }i \text{ does not get the treatment (untreated)} \\
+\end{cases}
+$$
+
+Note: $i$ refers to an individual within our data. For example, we might have Ben, Ava, Anna, etc. in our study. $i$ is any specific individual.
+
+## Example
+
+We might be interested in how receiving a scholarship affects academic performance (let us say GPA)
+
+```{dot}
+//| fig-width: 3.5
+//| fig-height: 0.4
+digraph example1 {
+  bgcolor="transparent";
+  // Nodes
+  D [shape=box, label="Scholarship (D)"]
+  Y [shape=box, label="GPA (Y)"]
+
+  // Edges
+  D -> Y [label="Causal Effect"]
+
+  // Graph styling
+  rankdir=LR; // Left to right layout
+}
+```
+
+This means:
+
+$$
+D_i =\begin{cases}
+1 & \text{if individual }i \text{ gets scholarship (treated)} \\
+1 & \text{if individual }i \text{ does not get scholarship (untreated)} \\
+\end{cases}
+$$
+
+How do we find the causal effect? Do we just look at the differences between the GPA of people who got the scholarship vs. people who did not get the scholarship?
+
+## Issue: Confounders
+
+What if getting the scholarship is dependent on being smart (such as scoring well on a test). The, our relationship looks like this:
+
+```{dot}
+//| fig-width: 3
+//| fig-height: 1.1
+digraph example2 {
+  bgcolor="transparent";
+  // Nodes
+  D [shape=box, pos = "0,0!", label="Scholarship (D)"]
+  X [shape=box, pos = "2,0!", label="Intelligence"]
+  Y [shape=box, pos = "1,-1!", label="GPA (Y)"]
+
+  // Edges
+  {rank=same; D -> Y [label="Causal Effect"]}
+  X -> D
+  X -> Y [dir=both]
+  
+  graph [nodesep=0.5, ranksep=0.5]
+
+}
+```
+
+So if we compare the GPA of those with a scholarship and without one, we run into an issue:
+
+**Issue**: We do not know if differences in the GPA are caused by the scholarship, or caused by differences in intelligence.
+
+Thus, we cannot isolate the effect of the scholarship on GPA.
+
+## Formalising Confounders
+
+Intelligence is a confounder.
+
+```{dot}
+//| fig-width: 3
+//| fig-height: 1.1
+digraph example2 {
+  bgcolor="transparent";
+  // Nodes
+  D [shape=box, pos = "0,0!", label="Scholarship (D)"]
+  X [shape=box, pos = "2,0!", label="Intelligence (Confounder)"]
+  Y [shape=box, pos = "1,-1!", label="GPA (Y)"]
+
+  // Edges
+  {rank=same; D -> Y [label="Causal Effect"]}
+  X -> D
+  X -> Y [dir=both]
+  
+  graph [nodesep=0.5, ranksep=0.5]
+
+}
+```
+
+A confounder $X$ is a variable that meets 3 characteristics:
+
+1.  Confounder causes who gets the treatment. In this case, intelligence causes who gets the scholarship.
+2.  Confounders are correlated with the outcome. In this case, intelligent people tend to get better GPAs.
+3.  Confounders are not a result of the treatment. In this case, getting a scholarship does not cause intelligence (it's the other way around).
+
+## Selection Bias
+
+When there exists a confounder, we cannot determine if the differences in the outcome $Y$ are a result of treatment $D$, or the confounder $X$.
+
+This issue is called **selection bias**. This is because the confounder $X$ causes/selects different people to get the treatment and not get treatment.
+
+-   In our example, intelligent people are more likely to get treatment. So our treated individuals are likely to be more intelligent than our untreated individuals.
+
+Since different people get the treatment than people who do not get the treatment, we do not know if our difference in outcome $Y$ is a result of treatment $D$ or the pre-existing differences between treated and untreated.
+
+## Solution: Identification
+
+What is the solution to selection bias? Well - we have to account for the influence of confounders in 2 ways:
+
+1.  "Control" for confounders through research design - such as finding situations to compare treated vs. untreated where their confounder values are similar.
+2.  Making **assumptions** for confounders we cannot control for.
+
+This process of getting rid of the influence of confounders is called the **identification** of the causal effect.
+
+## What Happens when we Account for Confounders
+
+We know that confounders cause selection into treatment.
+
+```{dot}
+//| fig-width: 3
+//| fig-height: 1.1
+digraph example2 {
+  bgcolor="transparent";
+  // Nodes
+  D [shape=box, pos = "0,0!", label="Scholarship (D)"]
+  X [shape=box, pos = "2,0!", label="Intelligence (Confounder)"]
+  Y [shape=box, pos = "1,-1!", label="GPA (Y)"]
+
+  // Edges
+  {rank=same; D -> Y [label="Causal Effect"]}
+  X -> D
+  X -> Y [dir=both]
+  
+  graph [nodesep=0.5, ranksep=0.5]
+
+}
+```
+
+-   Here - intelligent people are more likely to get treatment (select into treatment), and less intelligent people are less likely to.
+
+Let us assume we somehow **control** for intelligence (how this is done will be the topic of the rest of the classes).
+
+If we control/account for intelligence (and all confounders), now what controls selection into treatment? - **Random Chance**.
+
+## Exogeneity
+
+When we control/account for all confounders that cause individuals to select into treatment, the only thing remaining that causes individuals to select into treatment is **randomness**.
+
+This means when all confounders are controlled for, assignment of treatment $D$ is now **random**.
+
+When assignment of any variable (including $D$) is random, we call this variable **exogeneous**.
+
+-   And when there are confounders (and thus not random assignment), we say the variable is **endogenous**.
+
+(You may have heard of exogeneity from Regression - it is the same thing. When we control for all confounders in a regression, our main explanatory variable is now exogenous)
+
+## Exogeneity and Causality
+
+We know the following two things:
+
+1.  When we control/account for all confounders, we can find the causal effect between treatment $D$ and outcome $Y$.
+2.  When we control/account for all confounders, our treatment $D$ is exogenous (randomly assigned).
+
+Thus combining these two statements:
+
+-   We can identify/find the causal effect of treatment $D$ on outcome $Y$, if treatment $D$ is exogenous.
+
+Our goal for causal inference is thus to make our treatment $D$ exogenous (or achieve exogeneity).
+
+## Randomisation and Causation
+
+What is the simplest way to make treatment $D$ exogenous?
+
+-   Well obviously - we run a controlled experiment, and we randomly assign individuals to treated and untreated groups!
+
+These are called **Randomised Experiments** - they are the **gold standard** (best method) for causal inference.
+
+**Issue**: It is hard to run randomised experiments for several reasons:
+
+1.  Expensive: even big universities often do not have the budget.
+2.  Impossible: Lets say your treatment is democracy. You would have to randomly assign countries to be democracies or dictatorships. Well you can't really tell Canada - Hey, I randomly decided you are going to be a dictatorship.
+
+Thus, this course covers many methods to make treatment exogenous (random) without randomised experiments.

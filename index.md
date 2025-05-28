@@ -21,11 +21,11 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 
 #### 1. Causal Frameworks I: Exogeneity
 
-Lecture Slides
+[Lecture Slides](https://kevinli03.github.io/causal/frameworks1.pdf)
 
 #### 2. Causal Frameworks II: Potential Outcomes
 
-Lecture Slides
+[Lecture Slides](https://kevinli03.github.io/causal/frameworks2.pdf)
 
 #### 3. Difference-in-Differences I: Classical DiD
 
