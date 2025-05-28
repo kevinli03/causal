@@ -75,7 +75,7 @@ $$
 \tau_i = Y_i(1) - Y_i(0)
 $$
 
-The fundamental **problem of causal inference** is that we never observe both of these potential outcomes, meaning we cannot calculate the true treatment effect $\tau_i$.
+The **fundamental** **problem of causal inference** is that we never observe both of these potential outcomes, meaning we cannot calculate the true treatment effect $\tau_i$.
 
 **Solution**: Our goal in causal inference is thus to estimate/approximate the missing counterfactual, so we can estimate the causal effect.
 

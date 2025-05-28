@@ -21,41 +21,61 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 
 #### 1. Causal Frameworks I: Exogeneity
 
+*In this lecture, I introduce the issue of confounders in causal identification, and how it relates to randomness/exogeneity.*
+
 [Lecture Slides](https://kevinli03.github.io/causal/frameworks1.pdf)
 
 #### 2. Causal Frameworks II: Potential Outcomes
+
+*In this lecture, I discuss the potential outcomes framework for causal inference, and introduce the main estimands: ATE, ATT, and LATE.*
 
 [Lecture Slides](https://kevinli03.github.io/causal/frameworks2.pdf)
 
 #### 3. Difference-in-Differences I: Classical DiD
 
+*In this lecture, I introduce the classical 2-period Difference-in-Differences design used for causal identification, and the parallel trends assumption*.
+
 Lecture Slides
 
 #### 4. Difference-in-Differences II: Generalised DiD
+
+*In this lecture, I expand DiD to multiple pre-and-post periods, introduce the two-way fixed effects estimator, and discuss conditioning for parallel trends.*
 
 Lecture Slides
 
 #### 5. Difference-in-Differences III: Staggered DiD
 
+*In this lecture, I expend DiD to staggered treatment settings, discuss the issues with TWFE in staggered settings, and discuss modern advances in DiD*.
+
 Lecture Slides
 
 #### 6. Instrumental Variables I: Intuition and Estimation
+
+*In this lecture, I introduce the intuition behind instrumental variables, and discuss the two-stage least squares estimator*.
 
 Lecture Slides
 
 #### 7. Instrumental Variables II: Research Designs
 
+*In this lecture, I introduce the non-compliance research design and examiner instruments research design*.
+
 Lecture Slides
 
 #### 8. Regression Discontinuity I: Sharp Discontinuity
 
+*In this lecture, I introduce the regression discontinuity design and its sharp variant, as well as the key identification assumptions and design of RDD*.
+
 Lecture Slides
 
-#### 9. Regression Discontinuity II: Fuzzy Discontinuity
+#### 9. Regression Discontinuity II:  Extensions
+
+*In this lecture, I expand on RDD to discuss fuzzy discontinuity designs and regression kink designs*.
 
 Lecture Slides
 
 #### 10. Matching Designs
+
+*In this lecture, I discuss matching and matching-inspired designs, such as distance matching, propensity score matching, genetic matching, and regression*.
 
 Lecture Slides
 

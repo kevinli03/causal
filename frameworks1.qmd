@@ -21,38 +21,6 @@ In causal inference, we are interested in how treatment $D$ affects outcome $Y$.
 digraph example1 {
   bgcolor="transparent";
   // Nodes
-  D [shape=box, label="Treatment (D)"]
-  Y [shape=box, label="Outcome (Y)"]
-
-  // Edges
-  D -> Y [label="Causal Effect"]
-
-  // Graph styling
-  rankdir=LR; // Left to right layout
-}
-```
-
-We generally assume that treatment $D$ is binary:
-
-$$
-D_i =\begin{cases}
-1 & \text{if individual }i \text{ gets the treatment (treated)} \\
-1 & \text{if individual }i \text{ does not get the treatment (untreated)} \\
-\end{cases}
-$$
-
-Note: $i$ refers to an individual within our data. For example, we might have Ben, Ava, Anna, etc. in our study. $i$ is any specific individual.
-
-## Example
-
-We might be interested in how receiving a scholarship affects academic performance (let us say GPA)
-
-```{dot}
-//| fig-width: 3.5
-//| fig-height: 0.4
-digraph example1 {
-  bgcolor="transparent";
-  // Nodes
   D [shape=box, label="Scholarship (D)"]
   Y [shape=box, label="GPA (Y)"]
 
@@ -64,12 +32,12 @@ digraph example1 {
 }
 ```
 
-This means:
+The treatment $D$ is usually assumed to be binary:
 
 $$
 D_i =\begin{cases}
 1 & \text{if individual }i \text{ gets scholarship (treated)} \\
-1 & \text{if individual }i \text{ does not get scholarship (untreated)} \\
+0 & \text{if individual }i \text{ does not get scholarship (untreated)} \\
 \end{cases}
 $$
 
@@ -208,18 +176,3 @@ Thus combining these two statements:
 -   We can identify/find the causal effect of treatment $D$ on outcome $Y$, if treatment $D$ is exogenous.
 
 Our goal for causal inference is thus to make our treatment $D$ exogenous (or achieve exogeneity).
-
-## Randomisation and Causation
-
-What is the simplest way to make treatment $D$ exogenous?
-
--   Well obviously - we run a controlled experiment, and we randomly assign individuals to treated and untreated groups!
-
-These are called **Randomised Experiments** - they are the **gold standard** (best method) for causal inference.
-
-**Issue**: It is hard to run randomised experiments for several reasons:
-
-1.  Expensive: even big universities often do not have the budget.
-2.  Impossible: Lets say your treatment is democracy. You would have to randomly assign countries to be democracies or dictatorships. Well you can't really tell Canada - Hey, I randomly decided you are going to be a dictatorship.
-
-Thus, this course covers many methods to make treatment exogenous (random) without randomised experiments.
