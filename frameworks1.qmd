@@ -175,4 +175,32 @@ Thus combining these two statements:
 
 -   We can identify/find the causal effect of treatment $D$ on outcome $Y$, if treatment $D$ is exogenous.
 
-Our goal for causal inference is thus to make our treatment $D$ exogenous (or achieve exogeneity).
+Our goal for causal inference is thus to make our treatment $D$ exogenous (or randomly assigned).
+
+## Achieving Exogeneity: Randomisation
+
+We want treatment $D$ to be exogenous/random to identify the causal effects
+
+The easiest way to do this: well let us personally (as researchers) randomly assign treatment. This is called a **randomised controlled trial** or **randomised experiment**.
+
+Downside: we have to be able to control who gets treatment and who does not, so we can assign treatment on some random mechanism.
+
+-   It isn't very common where we have control over who gets the treatment, and who doesn't get the treatment.
+
+-   Even if it is possible to have control (like a clinical trial), it is also very expensive. So this may not be a feasible strategy.
+
+## Achieving Exogeneity: Regression
+
+We can also achieve exogeneity if we include every single possible confounder in our regression with our treatment:
+
+$$
+Y_i = \alpha + D_i\tau + \mathbf X_{i}^\top\boldsymbol\beta + \varepsilon_i
+$$
+
+-   Where $\mathbf X_i$ is a vector of values for all confounders for unit $i$.
+
+If all confounders are in our regression, then $\tau$ will be an unbiased estimate of the causal effect of treatment $D$ on outcome $Y$.
+
+**Issue**: Often times, we do not know all the confounders, or we do not have data on all the confounders.
+
+-   If we miss just one confounder, our causal estimate will be biased. So this may not be a feasible strategy.

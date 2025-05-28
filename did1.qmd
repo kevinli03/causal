@@ -71,18 +71,6 @@ Why? Something could have happened between March and December, like a recession 
 
 -   How do we know if those factors are explaining the change in employment, or our treatment?
 
-```{r}
-#| fig-height: 4
-#| warning: false
-#| message: false
-#| fig-align: center
-
-plot1
-
-```
-
-## Our Issue in Potential Outcomes
-
 We can also think of this issue in terms of potential outcomes. Our causal effect in December 1992 is:
 
 $$
@@ -90,15 +78,6 @@ $$
 $$
 
 But we do not observe $\overline Y_\text{Dec}(0)$ since New Jersey is treated in Dec.
-
-```{r}
-#| fig-height: 4
-#| warning: false
-#| message: false
-#| fig-align: center
-
-plot1
-```
 
 ## Solution: Trend in Control Group
 
@@ -210,7 +189,7 @@ $$
 The estimated counterfactual for the treated group is thus:
 
 $$
-\overline Y^{(G=1)}_{t=0} + (\text{trend}) = \overline Y^{(G=1)}_{t=0} + \left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right)
+\overline Y^{(G=1)}_{t=0} + (\text{trend}) \ =\ \overline Y^{(G=1)}_{t=0} + \left(\overline Y^{(G=0)}_{t=1} - \overline Y^{(G=0)}_{t=0}\right)
 $$
 
 The estimated causal effect is thus:
@@ -232,6 +211,22 @@ $$
 -   The second part is the difference in average $Y$ between time periods for the control group $G=0$.
 
 The total causal effect is the difference of these two differences. Hence, difference-in-differences.
+
+## Regression Estimator
+
+We can also use a regression estimator, which makes calculating standard errors simpler:
+
+$$
+\hat Y_{it} = \hat\alpha +  G_i\hat \gamma +  T_{it}\hat\delta + G_iT_{it} \hat\tau_\text{ATT}
+$$
+
+-   $G_{i}$ is the variable indicating the group for the unit (treated, control)
+
+-   $T_{it}$ is the variable indicating the time period for the observation.
+
+-   Standard errors should be clustered at the group $G_i$ level.
+
+(You can confirm this is equal to the previous DiD estimator - plug in the correct values for $G_i$ and $T_{it}$ for each $\overline Y^{(G=G_i)}_{t=T_{it}}$ in the previous equation for DiD).
 
 ## Parallel Trends Assumption
 

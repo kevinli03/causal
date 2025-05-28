@@ -49,21 +49,27 @@ Lecture Slides
 
 Lecture Slides
 
-#### 6. Regression Discontinuity Design
-
-*In this lecture, I introduce the regression discontinuity design and its sharp variant, as well as the key identification assumptions and design of RDD*.
-
-Lecture Slides
-
-#### 7. Instrumental Variables Design
+#### 6. Instrumental Variables Design
 
 *In this lecture, I introduce the intuition behind instrumental variables, and discuss the two-stage least squares estimator*.
 
 Lecture Slides
 
-#### 8. Selection on Observables
+#### 6. Regression Discontinuity I: Sharp Discontinuity
 
-*In this lecture, I discuss matching designs, such as distance matching, propensity score matching, and genetic matching.*
+*In this lecture, I introduce the regression discontinuity design and its sharp variant, as well as the key identification assumptions and design of RDD*.
+
+Lecture Slides
+
+#### 7. Regression Discontinuity II: Fuzzy Discontinuity
+
+*In this lecture, I introduce the fuzzy regression discontinuity design - a combination of instrumental variables and sharp regression discontinuity.*
+
+Lecture Slides
+
+#### 8. Regression Discontintuity III: Regression Kink
+
+*In this lecture, I discuss the regression kink design*.
 
 Lecture Slides
 

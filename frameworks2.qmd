@@ -113,3 +113,15 @@ We know that $Y_i(1)$ and $Y_i(0)$ come from hypothetical worlds that are identi
 That also implies that between these two hypothetical worlds, the confounder values are equal (there are no differences between confounders).
 
 Thus, the potential outcomes definition of causality implies exogeneity as well, and the reverse is also true: randomisation allows us to find missing counterfactuals and causal effects.
+
+## Stable Unit Treatment Value Assumption
+
+The potential outcomes framework depends on the Stable Unit Treatment Value Assumption (SUTVA).
+
+-   Individual A's potential outcomes are not affected by if individual B receives or does not receive treatment.
+
+Common violations:
+
+-   **Spillover**: if we are studying the effect of a new curriculum on student performance, if Student A's friend gets the new curriculum, that could affect Student A's performance.
+
+-   **Saturation**: If we are studying the effects of a vaccine, if enough of individual A's surrounding community gets the vaccine, individual A's outcomes will change because of herd immunity.
