@@ -1,0 +1,275 @@
+---
+title: "Instrumental Variables I: Theory"
+subtitle: "Lecture 9 - Introduction to Causal Inference"
+author: "Kevin Li"
+format:
+  beamer:
+    slide-number: true
+header-includes: |
+  \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
+  \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
+editor: visual
+---
+
+## Our Issue
+
+**Issue**: We want to find the effect of treatment $D$ on outcome $Y$, but there is a confounder.
+
+```{dot}
+//| fig-width: 2.5
+//| fig-height: 1.1
+digraph example2 {
+  bgcolor="transparent";
+  // Nodes
+  D [shape=box, pos = "0,0!", label="Treatment (D)"]
+  X [shape=box, pos = "2,0!", label="Confounder (X)"]
+  Y [shape=box, pos = "1,-1!", label="Outcome (Y)"]
+
+  // Edges
+  {rank=same; D -> Y [label="Causal Effect"]}
+  X -> D
+  X -> Y [dir=both]
+  
+  graph [nodesep=0.5, ranksep=0.5]
+
+}
+```
+
+Let us say a random experiment is not possible (we do not control who gets or does not get the scholarship).
+
+-   How can we get the treatment $D$ to be exogenous to get the causal effect?
+
+## Instrumental Variable
+
+What if we have an extra variable $Z$:
+
+```{dot}
+//| fig-width: 4.1
+//| fig-height: 1
+digraph example2 {
+  bgcolor="transparent";
+  // Nodes
+  D [shape=box, pos = "0,0!", label="Treatment (D)"]
+  X [shape=box, pos = "2,0!", label="Confounder (X)"]
+  Y [shape=box, pos = "1,-1!", label="Outcome (Y)"]
+  I [shape=box, pos = "1,-1!", label="Instrument (Z)"]
+
+  // Edges
+  {rank=same; D -> Y [label="Causal Effect"]}
+  {rank=same; I -> D}
+  X -> D
+  X -> Y [dir=both]
+  
+  graph [nodesep=0.5, ranksep=0.5]
+}
+
+```
+
+This **instrumental variable** $Z$ has a few characteristics:
+
+1.  $Z$ is correlated with the treatment $D$.
+2.  $Z$ is uncorrelated with any confounder $X$.
+3.  $Z$ has no direct effect on the outcome $Y$ (only through $D$).
+4.  $Z$ is **exogenous** to $Y$ (no confounders between $Z$ and $Y$).
+
+## Inducing Exogeneity in Treatment
+
+Instead of using our original treatment variable $D$, let us instead only use the **part of** $D$ **caused by** $Z$. Let us call this $\hat D$.
+
+```{dot}
+//| fig-width: 4.1
+//| fig-height: 1
+digraph example2 {
+  bgcolor="transparent";
+  // Nodes
+  D [shape=box, pos = "0,0!", label="Part of D Explained by Z"]
+  Y [shape=box, pos = "1,-1!", label="Outcome (Y)"]
+  I [shape=box, pos = "1,-1!", label="Instrument (Z)"]
+  X [shape=box, pos = "2,0!", label="Confounder (X)"]
+
+  // Edges
+  {rank=same; D -> Y [label="Causal Effect"]}
+  {rank=same; I -> D}
+  X -> D [style = dotted]
+  X -> Y [dir=both]
+  
+  graph [nodesep=0.5, ranksep=0.5]
+}
+
+```
+
+The confounder $X$ does not cause $\hat D$. Why?
+
+-   Because $\hat D$ is the part of $D$ explained by $Z$.
+
+-   Since $Z$ is uncorrelated with $X$, then $\hat D$ is not caused by $X$.
+
+Thus, $X$ is no longer a confounder - since it doesn't affect selection in $\hat D$.
+
+## Instrumental Variables Estimator
+
+By using an instrument $Z$ and $\hat D$, $X$ is no longer a confounder between $\hat D$ and $Y$. Thus, $\hat D$ is exogenous (if $Z$ is exogenous).
+
+```{dot}
+//| fig-width: 4.1
+//| fig-height: 1
+digraph example2 {
+  bgcolor="transparent";
+  // Nodes
+  D [shape=box, pos = "0,0!", label="Part of D Explained by Z"]
+  X [shape=box, pos = "2,0!", label="(X)"]
+  Y [shape=box, pos = "1,-1!", label="Outcome (Y)"]
+  I [shape=box, pos = "1,-1!", label="Instrument (Z)"]
+
+  // Edges
+  {rank=same; D -> Y [label="Causal Effect"]}
+  {rank=same; I -> D}
+  X -> D [style = invis]
+  X -> Y [dir=both]
+  
+  graph [nodesep=0.5, ranksep=0.5]
+}
+
+```
+
+Since $\hat D$ is exogenous and there are no more confounders between $\hat D$ and $Y$, we can calculate the causal effect of $\hat D$ on $Y$.
+
+-   This is the Local Average Treatment Effect of $\hat D$ on $Y$.
+
+-   Note: This might not be the same as the effect of $D$ on $Y$ (we are using $\hat D$, not $D$).
+
+## Local Average Treatment Effect
+
+The calculated treatment effect of $\hat D$ on $Y$ is called the local average treatment effect.
+
+-   Substantively, it is the causal effect of $D$ on $Y$ for the part of $D$ explained by $Z$
+
+-   This is also called the causal effect for **compliers**. Compliers are the units whose treatment $D$ that "comply" (are influenced/caused) by the exogenous $Z$.
+
+As noted before, this might not be equal to the total average treatment effect (ATE) between $D$ and $Y$.
+
+-   This has caused debates over the usefulness of the LATE of $\hat D$ on $Y$. Some believe LATE is not that useful, while others believe it is better than nothing.
+
+## Requirements of a Valid Instrument
+
+For instrumental variables to work, we must have an instrument that meets 3 assumptions:
+
+-   **Relevance**: $Z$ must be correlated with $D$.
+
+-   **Exogeneity**: $Z$ must be exogenous/randomly assigned in respect to both $D$ and $Y$. That means no confounders between $Z$ and $Y$, and $Z$ and $D$.
+
+-   **Exclusions**: $Z$ must not have a direct causal effect on $Y$ (It should have an indirect one through $D$, but no direct causal effect).
+
+The next few slides covers each in more detail.
+
+## Relevance Assumption
+
+The relevance assumption is that $Z$ must be correlated with $D$.
+
+```{dot}
+//| fig-width: 4
+//| fig-height: 0.9
+digraph example2 {
+  bgcolor="transparent";
+  // Nodes
+  D [shape=box, pos = "0,0!", label="Part of D Explained by Z"]
+  Y [shape=box, pos = "1,-1!", label="Outcome (Y)"]
+  I [shape=box, pos = "1,-1!", label="Instrument (Z)"]
+
+  // Edges
+  {rank=same; D -> Y [label="Causal Effect"]}
+  {rank=same; I -> D [label = "Relevance"]}
+  
+  graph [nodesep=0.5, ranksep=0.5]
+}
+
+```
+
+This makes sense - if $Z$ is not correlated with $D$, then no part of $D$ can be explained by $Z$.
+
+We can test relevance by running a regression of $D$ on $Z$:
+
+$$
+D_i = \delta + Z_i\beta + \varepsilon_i
+$$
+
+-   If $\beta$ is significant, relevance is met.
+
+Note: in the next lecture, we will discuss more issues with a weakly correlated $Z$ and $D$.
+
+## Exogeneity Assumption
+
+$Z$ must be exogenous/randomly assigned in respect to both $D$ and $Y$. The dotted lines below shows violations to exogeneity:
+
+```{dot}
+//| fig-width: 4.5
+//| fig-height: 0.9
+digraph example2 {
+  bgcolor="transparent";
+  // Nodes
+  D [shape=box, pos = "0,0!", label="Part of D Explained by Z"]
+  X [shape=box, pos = "2,0!", label="Confounder (X1)"]
+  Q [shape=box, pos = "2,0!", label="Confounder (X2)"]
+  Y [shape=box, pos = "1,-1!", label="Outcome (Y)"]
+  I [shape=box, pos = "1,-1!", label="Instrument (Z)"]
+
+  // Edges
+  {rank=same; D -> Y [label="Causal Effect"]}
+  {rank=same; I -> D}
+  I -> X [style = dotted]
+  I -> Q [style = dotted]
+  Q -> D
+  X -> Y [dir=both]
+  
+  graph [nodesep=0.5, ranksep=0.5]
+}
+
+```
+
+We can solve exogeniety violations by **controlling**/**accounting** for the confounders.
+
+-   We will cover this in the next lecture during estimation.
+
+There is no real way to test exogeneity violations. The recommendation is to draw a diagram like this based on your understanding of the research topic.
+
+## Exclusions Restriction
+
+The exclusions restriction states $Z$ must not have a direct effect on $Y$. It can only have an indirect effect through $D$.
+
+```{dot}
+//| fig-width: 5
+//| fig-height: 1
+digraph example2 {
+  bgcolor="transparent";
+  // Nodes
+  D [shape=box, pos = "0,0!", label="Part of D Explained by Z"]
+  X [shape=box, pos = "2,0!", label="Confounder (X)"]
+  Y [shape=box, pos = "1,-1!", label="Outcome (Y)"]
+  I [shape=box, pos = "1,-1!", label="Instrument (Z)"]
+
+  // Edges
+  {rank=same; D -> Y [label="Causal Effect"]}
+  {rank=same; I -> D}
+  X -> Y [dir=both]
+  I -> Y [style = dotted, label = "exclusions violation"]
+  
+  graph [nodesep=0.5, ranksep=0.5]
+}
+
+```
+
+Why? Well if $Z$ has an independent effect on $Y$ outside of $D$, then $Z$ is a confounder between $\hat D$ and $Y$, and $\hat D$ will no longer be exogeneous.
+
+There is no way to test the exclusions restriction. You can only justify it through your own understanding of the research topic in question.
+
+## Finding Valid Instruments
+
+It is difficult finding an instrument that plausibly satisfies relevance, exogeneity, and exclusions.
+
+-   In the econometrics literature, a lot of attention is put on trying to find an instrument that doesn't violate exclusions.
+
+-   However, **Exogeneity** is actually probably the more difficult assumption to meet - it is hard to find a $Z$ that is truly randomly assigned in terms of both $D$ and $Y$.
+
+-   Common instruments are often random by nature: Lotteries, rainfall, natural disasters, random selection of beneficiaries for policy pilots, etc.
+
+The most reliable way to find instruments is with non-compliance or examiner designs, that we will cover in a later lecture.

@@ -69,17 +69,17 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 
 -   [Lecture Slides](https://kevinli03.github.io/causal/rdd2.pdf)
 
-#### 9. Instrumental Variables I: Overview
+#### 9. Instrumental Variables I: Theory
 
-*In this lecture, I introduce the intuition behind instrumental variables, and discuss the two-stage least squares estimator*.
+*In this lecture, I introduce the intuition behind instrumental variables, and the assumptions needed for a valid instrument.*
 
--   Lecture Slides
+-   [Lecture Slides](https://kevinli03.github.io/causal/iv1.pdf)
 
-#### 10. Instrumental Variables II: Assumptions
+#### 10. Instrumental Variables II: 2SLS
 
-*In this lecture, I discuss the assumptions behind a valid instrument, how to test (if possible) these assumptions, as well as discuss risks with weak instruments.*
+*In this lecture, I discuss the estimation of causal effects with instrumental variables, including the 2SLS estimator. I also discuss issues with weak instruments.*
 
--   Lecture Slides
+-   [Lecture Slides](https://kevinli03.github.io/causal/iv2.pdf)
 
 #### 11. Instrumental Variables III: Non-Compliance
 
