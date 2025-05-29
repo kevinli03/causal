@@ -63,11 +63,11 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 
 -   [Lecture Slides](https://kevinli03.github.io/causal/rdd1.pdf)
 
-#### 8. Regression Discontinuity II: Regression Kink
+#### 8. Regression Discontinuity II: Extensions
 
-*In this lecture, I discuss the regression kink design, an extenion of the regression discontinuity design.*
+*In this lecture, I discuss extensions of the RDD design, including parametric estimators (linear, quadratic), as well as the regression kink design.*
 
--   Lecture Slides
+-   [Lecture Slides](https://kevinli03.github.io/causal/rdd2.pdf)
 
 #### 9. Instrumental Variables I: Overview
 
@@ -75,7 +75,13 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 
 -   Lecture Slides
 
-#### 10. Instrumental Variables II: Non-Compliance
+#### 10. Instrumental Variables II: Assumptions
+
+*In this lecture, I discuss the assumptions behind a valid instrument, how to test (if possible) these assumptions, as well as discuss risks with weak instruments.*
+
+-   Lecture Slides
+
+#### 11. Instrumental Variables III: Non-Compliance
 
 *In this lecture, I introduce the most common design for instrumental variables: non-compliance. This includes non-compliance in randomised experiments, and non-compliance in regression discontinuity (Fuzzy RDD).*
 

@@ -115,6 +115,18 @@ Local Linear Regression differs from normal linear regression, because we can we
 
 -   In RDD, we weight points closer to the cutoff more heavily, so we can more accurately estimate the jump
 
+## Local Average Treatment Effect
+
+What is the estimated $\hat\tau$ we get from looking at the jump/discontinuity? It is the **local average treatment effect** (LATE)
+
+Recall the LATE is the average treatment effect for a set of individuals $i$ who meet a set of criteria.
+
+-   In RDD, the estimated $\hat\tau$ is the average treatment effect for the units **exactly at the cutoff** $X=c$.
+
+-   We can usually generalise the LATE to individuals nearby the cutoff $X=c$ with no issues.
+
+-   However, the estimated LATE cannot be generalised to all individuals in our study - it is possible people far from the cutoff $X=c$ will have drastically different treatment effects.
+
 ## Bandwidth Selection
 
 We are interested in the jump at the cutoff. So, it is not very useful to include data from individuals far from the cutoff.
@@ -126,15 +138,3 @@ There is a tradeoff in selecting bandwidths (how much data around the cutoff to 
 -   However, only using as small bandwidth as possible reduces the amount of data/sample size we have, which creates much higher variance/uncertainty.
 
 **Solution**: Catanneo et al (2020, 2024) propose using the bandwidth that minimises the mean squared error of the predictions of the best-fit lines (since lowest MSE means most accurate fitted lines).
-
-## Parametric Estimators
-
-While the most common RDD estimators use the machine learning local linear regression, we can also fit a normal linear regression or polynomial on both sides of the cutoff.
-
--   Linear lines: $Y = \alpha + \tau D + \beta_1 \tilde X + \beta_2 \tilde X D + \varepsilon$
-
--   Polynomials: $Y = \alpha + \tau D + \beta_1 \tilde X + \beta_2 \tilde X^2 + \beta_3 \tilde X D + \beta_4 \tilde X^2 D + \varepsilon$
-
-You should not do this unless you have very small sample sizes, in which local linear regression performs worse.
-
--   It can be useful if you are dealing with panel data (fixed effects are easy in these models). But, you can also manually do fixed effects (de-mean) and then run a local linear regression estimator.
