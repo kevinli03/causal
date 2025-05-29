@@ -19,47 +19,17 @@ But this is often not the case. For example, in the United States, individual st
 
 Staggered DiD allows for units to adopt treatment at different times.
 
--   Perhaps one **cohort**/group of individuals start treatment in $t=0$.
+-   Perhaps one **cohort**/group of individuals start treatment in $t=0$. Another cohort/group starts in $t=2$. And so on...
 
--   Another cohort/group of individuals start treatment in $t=2$.
+We should create different relative time variables $R$ for each cohort, such that the initial treatment year is always $R=0$.
 
--   And maybe many more cohorts of inidividuals start treatment at different times.
+## Issues with TWFE
 
-## Cohorts and Relative Time
+We can still use TWFE in the same way as generalised DiD. However, TWFE has two issues which make it **biased (bad)** for estimating causal effects in staggered DiD.
 
-A **cohort** is a group of units that begin treatment at the same time. Often, there will be a variable in the dataset called cohort or first.treat, indicating the initial treatment time period of a unit.
+-   DiD involves comparing treated to untreated units, or untreated to untreated units (for trends).
 
-**Relative time** $R$ is a new type of variable - that indicates the time relative to initial treatment adoption for each cohort.
-
--   No matter which time period a cohort begins treatment, the relative time is always $R=0$.
-
--   Pre-treatment periods are always negative $R ≤ -1$.
-
--   Post-treatment periods are always positive $R ≥ 0$.
-
-## TWFE and Staggered Treatment
-
-Two-way fixed effects is still possible in staggered treatment. The individual $\tau_\text{ATT}$ regression is still the same:
-
-$$
-\hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + D_{it}\hat\tau_\text{ATT} + \mathbf X_{it}^\top \hat{\pmb\beta}
-$$
-
-The dynamic treatment effects are now in terms of relative treatment periods (see previous slide):
-
-$$
-\hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + R_{it} \hat\tau_t + \mathbf X_{it}^\top \hat{\pmb\beta}
-$$
-
--   Relative time $R_{it}$ is a **categorical** variable with a reference category of -1.
-
-## Issue with TWFE: Forbidden Comparisons
-
-However, TWFE has two issues which make it **biased (bad)** for estimating causal effects in staggered DiD.
-
--   DiD involves comparing treated to untreated units, or untreated to untreated units (for trends). For staggered DiD, we should be making many of these comparisons - then finding the weighted average of these comparisons.
-
--   Goodman-Bacon (2021) finds that TWFE's $\hat\tau_\text{ATT}$ in staggered treatment also compares **treated** units from earlier cohorts with **treated** units from later cohorts. (Comparing treated to treated).
+-   Goodman-Bacon (2021) finds that TWFE's $\hat\tau_\text{ATT}$ in staggered DiD also compares **treated** units from earlier cohorts with **treated** units from later cohorts. (Comparing treated to treated).
 
 -   This comparison of treated to treated should not be in DiD. Thus, we consider this a "**forbidden comparison**" that can cause bias in our TWFE $\hat\tau_\text{ATT}$ estimate.
 
@@ -67,9 +37,7 @@ However, TWFE has two issues which make it **biased (bad)** for estimating causa
 
 In Staggered DiD, we are essentially running a bunch of smaller generalised DiD's for each cohort, and then combining them together into one causal estimate.
 
-Thus, our causal estimate is a weighted average of all these smaller cohort DiD's.
-
--   Logically, the weight of each cohort DiD should be based on how large that Cohort is (how many observations are in the cohort).
+-   The weight of each cohort DiD should be based on how large that cohort is (how many observations are in the cohort).
 
 -   But TWFE does not weight like this. It weights based on initial treatment period - earlier and later treated cohorts are given less (sometimes negative) weights.
 
@@ -94,21 +62,23 @@ Three "modern" DiD estimators do this:
 
 ## Interaction-Weighted (Sun and Abraham 2021)
 
-The interaction-weighted estimator first "matches" the correct comparisons by including interaction in the dynamic treatment effect TWFE regression:
+The interaction-weighted estimator first "matches" the correct comparisons by including interactions in TWFE:
 
 $$
-\hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + G_iR_{it} \hat\tau_{t,r} + \mathbf X_{it}^\top \hat{\pmb\beta}
+\hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + \sum_g \sum_{r≠-1} I_{itgr} \hat\tau_{g,r} + \mathbf X_{it}^\top \hat{\pmb\beta}
 $$
 
--   $G_i$ is a **categorical** variable indicating the cohort in which individual $i$ belongs to.
+-   $\sum_r I_{itr}$ is the same as dynamic treatment effects in TWFE.
 
--   The interaction of $G_i$ with relative time $R_{it}$ means that there is a $\hat\tau_{t,r}$ estimate for every relative time period for every cohort.
+-   $\sum_g I_{itg}$ tells us to do $\sum_r I_{itr}$ for all different cohorts/groups $g$.
 
-These numerous $\hat\tau_{t,r}$ are then aggregated together into either a singular $\tau_\text{ATT}$, or dynamic treatment effects.
+-   Basically, we are estimating dynamic treatment effects for each cohort separately.
+
+These numerous $\hat\tau_{g,r}$ for each group are then aggregated together into either a singular $\tau_\text{ATT}$, or dynamic treatment effects across groups.
 
 ## Doubly-Robust (Callaway and Sant'Anna 2021)
 
-The Doubly-Robust estimator does a very similar matching process to Interaction-Weighted to avoid forbidden comparisons.
+The Doubly-Robust estimator does a very similar matching process of running dynamic treatment effects for each cohort group separately.
 
 However, instead of relying solely on regression, Doubly-Robust relies on both interacted regression and inverse probability weighting (not important to know what this is).
 
@@ -142,9 +112,7 @@ Why don't we estimate it for every treated unit? This is called imputation. Seve
 
 -   DiD Imputation (Borusyak, Jaravel, and Spiess 2024).
 
--   FEct, IFEct, and MC (Liu, Xu, and Wang 2024).
-
-(IFEct and MC are slightly more advanced and different).
+-   FEct (Liu, Xu, and Wang 2024).
 
 ## Estimating Counterfactuals
 
@@ -163,3 +131,13 @@ $$
 Imputation estimators use untreated observations $D_{it} = 0$ to estimate $\hat\alpha_i$, $\hat\gamma_t$, and $\hat{\pmb\beta}$.
 
 Then, they use the above equation to predict the missing counterfactual $Y_{it}(0)$ for treated units, allowing us to directly calculate treatment effects.
+
+## Matching + Reweighting or Imputation
+
+Which type of modern DiD estimator should we use in staggered DiD?
+
+-   Matching + Reweighting is more established in the econometrics literature (especially Doubly-Robust, the most common method).
+
+-   Imputation estimators are better for checking pre-treatment parallel trends. They also allow for a more granular look at causal effects (since we can estimate individual causal effects - but these can be noisy).
+
+-   It is quite common to run all of them, and report all of the results.

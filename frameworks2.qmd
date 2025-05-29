@@ -23,23 +23,17 @@ In today's class, we will introduce another causal framework - potential outcome
 
 Imagine two hypothetical worlds that are identical, except one thing - whether individual $i$ gets the treatment or not.
 
-$$
-\begin{cases}
-\text{World 0} & i \text{ gets the treatment (treated) } D_i = 0 \\
-\text{World 1} & i \text{ does not get the treatment (untreated) } D_i = 1 \\
-\end{cases}
-$$
+-   World 0: $i$ does not get the treatment $D_i = 0$.
+
+-   World 1: $i$ gets the treatment $D_i = 1$.
 
 Now, let us find the outcome value $Y$ in both worlds:
 
-$$
-\begin{cases}
-\text{World 0} & D_i = 0, \text{ Outcome value: } Y_i(0) \\
-\text{World 1} & D_i = 1, \text{ Outcome value: } Y_i(1) \\
-\end{cases}
-$$
+-   World 0 without treatment: $Y$ outcome for $i$ is $Y_i(0)$.
 
-These are potential outcomes $Y$ in both hypothetical worlds.
+-   World 1 with treatment: $Y$ outcome for $i$ is $Y_i(1)$
+
+These two outcomes are **potential outcomes** in both hypothetical worlds.
 
 ## Individual Causal Effect
 
@@ -58,9 +52,9 @@ We denote causal effects with the greek letter $\tau$ (tau).
 
 ## Counterfactuals
 
-In real life, we do not have hypothetical parallel world (shocking).
+In real life, we do not have hypothetical parallel world (shocking). An individual $i$ either gets, or does not get treatment.
 
-An individual $i$ either gets, or does not get treatment. That means that we don't actually observe in real life one of the hypothetical worlds.
+That means that we don't actually observe in real life one of the hypothetical worlds.
 
 -   If $i$ gets treated $D_i = 1$ in real life, we will never observe their hypothetical outcome $Y_i(0)$ when they are untreated.
 -   If $i$ does not get treatment $D_i = 0$ in real life, we will never observe their hypothetical outcome $Y_i(1)$ when they are treated.
@@ -112,7 +106,7 @@ We know that $Y_i(1)$ and $Y_i(0)$ come from hypothetical worlds that are identi
 
 That also implies that between these two hypothetical worlds, the confounder values are equal (there are no differences between confounders).
 
-Thus, the potential outcomes definition of causality implies exogeneity as well, and the reverse is also true: randomisation allows us to find missing counterfactuals and causal effects.
+Thus, the potential outcomes definition of causality implies exogeneity as well.
 
 ## Stable Unit Treatment Value Assumption
 

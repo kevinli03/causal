@@ -27,6 +27,20 @@ For example, instead of only having data in March 1992 and December 1992 around 
 
 -   Data from 1993, 1994, etc. after the treatment.
 
+## Relative Time Periods
+
+In our data, treatment might start in any time-period, for example, the year $t=2000$.
+
+For difference-in-differences, it is standard to create a new variable called **relative time** $R$ - that indicates the time relative to initial treatment adoption for each cohort.
+
+-   The first treatment year in the relative time variable is always $R=0$.
+
+-   Pre-treatment periods are always negative $R ≤ -1$.
+
+-   Post-treatment periods are always positive $R ≥ 0$.
+
+For the control group who do not get treated ever, there is no $R$ value for the observations. (For implementation in software, we often set it to a super large or small number).
+
 ## Dynamic Treatment Effects
 
 We can still estimate an overall $\tau_\text{ATT}$ like in classical DiD. But we can also estimate causal effects for each individual post-treatment time-period $t= 0, 1, 2, \dots$.
@@ -59,7 +73,7 @@ plot <- ggiplot(
   ref.line = FALSE,             # we will add our own line later
   
   # optional aesthetic options
-  xlab     = "Time Period (First treatment starts t=0)",  # x-axis label
+  xlab     = "Relative Time Period (First treatment starts r=0)",  # x-axis label
   ylab     = "Dynamic Effect",        # y-axis label
   main = ""
 )
@@ -121,11 +135,11 @@ We don't need all periods to be estimates of 0 for parallel trends. But at least
 
 ## Conditional Parallel Trends
 
-Let us say we calculate pre-treatment effects (like on the last slide), and find evidence that parallel trends is violated.
-
 Generalised DiD allows us to **control/condition** for potential variables that cause violations in parallel trends.
 
--   Let us say we have some variable $X$, that is correlated with $Y$. If the trend of $X$ values in the treated group and control group are different, it is likely that the trend in $Y$ between the treated group and control group is different.
+-   Let us say we have some variable $X$, that is correlated with $Y$.
+
+-   If the trend of $X$ values over time in the treated group and control group are different, it is likely that the trend in $Y$ between the treated group and control group is different.
 
 -   Thus, we would want to condition on $X$ - i.e. holding $X$ constant, parallel trends is met.
 
@@ -172,14 +186,14 @@ Thus, all confounders are controlled for, and thus, treatment $D_{it}$ is exogen
 We can also use two-way fixed effects to estimate dynamic treatment effects (post-treatment) and pre-treatment estimates.
 
 $$
-\hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + T_t \hat\tau_t + \mathbf X_{it}^\top \hat{\pmb\beta}
+\hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + \sum_{r≠-1}I_{itr}\hat\tau_r + \mathbf X_{it}^\top \hat{\pmb\beta}
 $$
 
--   $T_t$ is a **categorical** time variable, indicating the period of time for the observation. $t=-1$ is set as the reference category.
+-   $r$ is the specific relative time period $R$ of the observation in question (see slide 3).
 
--   It should be adjusted such that $t=0$ is the first year of treatment, $t ≥ 0$ are post-treatment periods, and $t ≤ -1$ are pre-treatment periods.
+-   $I_{itr}$ is an indicator, that takes value $I=1$ if observation $it$ is in relative time period $R=r$, and $I=0$ otherwise.
 
-$\hat\tau_t$ are dynamic treatment effects for each time period $t$ **except** period $-1$. We base our parallel trends off of the last pre-treatment period $-1$, so the causal estimate is assumed to be 0.
+-   The $\sum_r I_{itr}$ basically says estimate a causal effect $\hat\tau_r$ for every relative time period $r$, except -1 (the last pre-treatment period). We base our parallel trends off of the last pre-treatment period, so the causal estimate for $r=-1$ is assumed to be 0.
 
 ## Repeated Cross-Section Data
 

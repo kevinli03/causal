@@ -45,7 +45,7 @@ How do we find the causal effect? Do we just look at the differences between the
 
 ## Issue: Confounders
 
-What if getting the scholarship is dependent on being smart (such as scoring well on a test). The, our relationship looks like this:
+What if getting the scholarship is dependent on being smart (such as scoring well on a test). Then, our relationship looks like this:
 
 ```{dot}
 //| fig-width: 3
@@ -105,13 +105,13 @@ A confounder $X$ is a variable that meets 3 characteristics:
 
 ## Selection Bias
 
-When there exists a confounder, we cannot determine if the differences in the outcome $Y$ are a result of treatment $D$, or the confounder $X$.
-
-This issue is called **selection bias**. This is because the confounder $X$ causes/selects different people to get the treatment and not get treatment.
+A confounder $X$ causes/selects different people to get the treatment and not get treatment.
 
 -   In our example, intelligent people are more likely to get treatment. So our treated individuals are likely to be more intelligent than our untreated individuals.
 
-Since different people get the treatment than people who do not get the treatment, we do not know if our difference in outcome $Y$ is a result of treatment $D$ or the pre-existing differences between treated and untreated.
+Since different people get the treatment than people who do not get the treatment, we do not know if our difference in outcome $Y$ is a result of treatment $D$, or the pre-existing differences between treated and untreated.
+
+These issue is called **selection bias**.
 
 ## Solution: Identification
 
@@ -181,7 +181,7 @@ Our goal for causal inference is thus to make our treatment $D$ exogenous (or ra
 
 We want treatment $D$ to be exogenous/random to identify the causal effects
 
-The easiest way to do this: well let us personally (as researchers) randomly assign treatment. This is called a **randomised controlled trial** or **randomised experiment**.
+Well let us personally (as researchers) control who gets treatment through a random number generator (or coin flip). This is called a **randomised controlled trial** or **randomised experiment**.
 
 Downside: we have to be able to control who gets treatment and who does not, so we can assign treatment on some random mechanism.
 
