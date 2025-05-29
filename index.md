@@ -15,7 +15,7 @@ These resources are a collection of the content I learned during my postgraduate
 
 For a more detailed look at difference-in-differences, see my [repository on DiD](https://kevinli03.github.io/did/). For more about me, see my [github page](https://kevinli03.github.io).
 
-&nbsp;
+ 
 
 ### Lectures and Resources
 
@@ -61,7 +61,7 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 
 *In this lecture, I introduce the regression discontinuity design and its sharp variant, as well as the key identification assumptions and design of RDD*.
 
--   Lecture Slides
+-   [Lecture Slides](https://kevinli03.github.io/causal/rdd1.pdf)
 
 #### 8. Regression Discontinuity II: Regression Kink
 
@@ -81,6 +81,6 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 
 -   Lecture Slides
 
-&nbsp;
+ 
 
 #### Appendix: Background Materials
