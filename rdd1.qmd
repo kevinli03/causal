@@ -1,6 +1,6 @@
 ---
 title: "Regression Discontinuity I: Sharp RDD"
-subtitle: "Lecture 7 - Introduction to Causal Inference"
+subtitle: "Lecture 8 - Introduction to Causal Inference"
 author: "Kevin Li"
 format:
   beamer:
@@ -11,7 +11,7 @@ header-includes: |
 editor: visual
 ---
 
-## Our Issue
+## Setup
 
 **Issue**: We want to find the effect of treatment $D$ on outcome $Y$, but there is a confounder.
 
@@ -35,15 +35,11 @@ digraph example2 {
 }
 ```
 
-Let us say a random experiment is not possible (we do not control who gets or does not get the scholarship).
-
--   How can we get the treatment $D$ to be exogenous to get the causal effect?
-
-## Assignment Cutoff
-
 Let us say that the scholarship is assigned to people who score above 90% on some standardised test.
 
 -   90% is our **assignment threshold**.
+
+## Cutoff and Exogneity
 
 Now, compare individuals who scored 89.9% on the exam, and 90.0% on the exam.
 
@@ -51,15 +47,9 @@ Now, compare individuals who scored 89.9% on the exam, and 90.0% on the exam.
 
 -   In fact, the people who scored 89.9% are likely on average the same as people who scored 90.0%. There was just some sort of luck/randomness (bad night's sleep, stupid mistake) that caused some to get 90% and others to get 89.9%.
 
-## Cutoff and Exogeneity
-
-People just below the cutoff for treatment (89.9%) and just above the cutoff (90.0%) are on average the same, and getting either 89.9% or 90.0% is just some random luck.
-
 Thus, right above and below the cutoff for receiving the treatment (scholarship), treatment assignment is approximately random/exogenous.
 
-**Regression Discontinuity**: Compare the people right below and right above the cutoff.
-
--   Since treatment is approximately exogenous right below and above the cutoff, we should be able to get the causal effect.
+-   Since $D$ at cutoff is exogenous, we can find treatment effect.
 
 ## Graphical Identification
 
@@ -79,21 +69,21 @@ The setup of regression discontinuity is as follows:
 
 We will usually create a new adjusted running variable $\tilde X$. This is basically the original $X$ variable, but adjusted so the cutoff value for treatment assignment is $\tilde X = 0$, anything $\tilde X ≥ 0$ means treatment is assigned, and $\tilde X < 0$ means no treatment.
 
--   We will explore non-compliance (so when not all units follow the cutoff) in lecture 10.
+-   We will explore non-compliance (so when not all units follow the cutoff) with fuzzy discontinuity in lecture 9.
 
 ## Assumption: Continuous Potential Outcomes
-
-We identify the causal effect in RDD by the "jump" (slide 5)
-
-![](images/clipboard-4041477651.png){fig-align="center" width="50%"}
 
 **Assumption**: if no treatment occurred, $Y$ would have not "jumped" at the cutoff $X=c$ (basically $Y_i(0)$ is continuous).
 
 -   If $Y$ value jump at the cutoff $X=c$ even without treatment, then we do not know if the jump we observe is because of the treatment $D$, or of some other reason.
 
+![](images/clipboard-4041477651.png){fig-align="center" width="50%"}
+
+(We also assume $Y_i(1)$ is continuous for same reason)
+
 ## Sorting
 
-We know RDD requires the assumption that if no treatment occurred, $Y$ would have not "jumped" at the cutoff $X=c$ (basically $Y_i(0)$ is continuous).
+We know RDD requires the assumption that the potential outcomes are continuous.
 
 The most common reason this is violated is because **sorting**:
 
@@ -103,7 +93,7 @@ The most common reason this is violated is because **sorting**:
 
 -   But these £22,000 salary people might be different from the people at £19,999, which messes up the continuity of $Y$.
 
-The McCary density test can check if sorting is occuring.
+The McCary density test can check if sorting is occuring. Cattaneo et al (2024) also have a test for sorting.
 
 ## Estimating Causal Effects
 
@@ -138,3 +128,19 @@ There is a tradeoff in selecting bandwidths (how much data around the cutoff to 
 -   However, only using as small bandwidth as possible reduces the amount of data/sample size we have, which creates much higher variance/uncertainty.
 
 **Solution**: Catanneo et al (2020, 2024) propose using the bandwidth that minimises the mean squared error of the predictions of the best-fit lines (since lowest MSE means most accurate fitted lines).
+
+## Parametric Estimator
+
+Generally, we prefer the local regression (machine learning) approach unless we have very mimimal data. But we can fit normal linear regression lines on both sides of the cutoff as follows:
+
+$$
+Y_i = \alpha + \tau D_i + \beta_1 \tilde X_i + \beta_2 \tilde X_i D_i + \varepsilon_i
+$$
+
+-   The estimate of $\tau$ is our causal estimate of the LATE.
+
+-   $\beta_1$ is the slope of the line fit for values $\tilde X_i < 0$ (below the cutoff, the side with no treatment).
+
+-   $\beta_1 + \beta_2$ is the slope of the line fit for values $\tilde X_i > 0$ (above the cutoff, the side with treatment).
+
+We can also fit polynomials in a similar way (for quadratic: two terms $\tilde X$ and $\tilde X^2$, then the same two terms interacted with $D$).

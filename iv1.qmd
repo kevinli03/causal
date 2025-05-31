@@ -1,6 +1,6 @@
 ---
-title: "Instrumental Variables I: Theory"
-subtitle: "Lecture 9 - Introduction to Causal Inference"
+title: "Instrumental Variables and 2SLS"
+subtitle: "Lecture 7 - Introduction to Causal Inference"
 author: "Kevin Li"
 format:
   beamer:
@@ -11,37 +11,9 @@ header-includes: |
 editor: visual
 ---
 
-## Our Issue
+## Setup
 
-**Issue**: We want to find the effect of treatment $D$ on outcome $Y$, but there is a confounder.
-
-```{dot}
-//| fig-width: 2.5
-//| fig-height: 1.1
-digraph example2 {
-  bgcolor="transparent";
-  // Nodes
-  D [shape=box, pos = "0,0!", label="Treatment (D)"]
-  X [shape=box, pos = "2,0!", label="Confounder (X)"]
-  Y [shape=box, pos = "1,-1!", label="Outcome (Y)"]
-
-  // Edges
-  {rank=same; D -> Y [label="Causal Effect"]}
-  X -> D
-  X -> Y [dir=both]
-  
-  graph [nodesep=0.5, ranksep=0.5]
-
-}
-```
-
-Let us say a random experiment is not possible (we do not control who gets or does not get the scholarship).
-
--   How can we get the treatment $D$ to be exogenous to get the causal effect?
-
-## Instrumental Variable
-
-What if we have an extra variable $Z$:
+**Issue**: We want to find the effect of treatment $D$ on outcome $Y$, but there is a confounder $X$. We have an extra variable $Z$:
 
 ```{dot}
 //| fig-width: 4.1
@@ -65,12 +37,12 @@ digraph example2 {
 
 ```
 
-This **instrumental variable** $Z$ has a few characteristics:
+This **instrumental variable** $Z$ has a few assumptions:
 
-1.  $Z$ is correlated with the treatment $D$.
-2.  $Z$ is uncorrelated with any confounder $X$.
-3.  $Z$ has no direct effect on the outcome $Y$ (only through $D$).
-4.  $Z$ is **exogenous** to $Y$ (no confounders between $Z$ and $Y$).
+1.  $Z$ is correlated with the treatment $D$ (**Relevance**).
+2.  $Z$ is uncorrelated with any confounder $X$ (**Exogeneity**).
+3.  $Z$ has no direct effect on the outcome $Y$, only indirectly through $D$ (**Exclusions Restriction**).
+4.  $Z$ is exogenous to $Y$ and $D$ (also **Exogeneity**).
 
 ## Inducing Exogeneity in Treatment
 
@@ -82,44 +54,10 @@ Instead of using our original treatment variable $D$, let us instead only use th
 digraph example2 {
   bgcolor="transparent";
   // Nodes
-  D [shape=box, pos = "0,0!", label="Part of D Explained by Z"]
+  D [shape=box, pos = "0,0!", label="Part of D Caused by Z"]
   Y [shape=box, pos = "1,-1!", label="Outcome (Y)"]
   I [shape=box, pos = "1,-1!", label="Instrument (Z)"]
   X [shape=box, pos = "2,0!", label="Confounder (X)"]
-
-  // Edges
-  {rank=same; D -> Y [label="Causal Effect"]}
-  {rank=same; I -> D}
-  X -> D [style = dotted]
-  X -> Y [dir=both]
-  
-  graph [nodesep=0.5, ranksep=0.5]
-}
-
-```
-
-The confounder $X$ does not cause $\hat D$. Why?
-
--   Because $\hat D$ is the part of $D$ explained by $Z$.
-
--   Since $Z$ is uncorrelated with $X$, then $\hat D$ is not caused by $X$.
-
-Thus, $X$ is no longer a confounder - since it doesn't affect selection in $\hat D$.
-
-## Instrumental Variables Estimator
-
-By using an instrument $Z$ and $\hat D$, $X$ is no longer a confounder between $\hat D$ and $Y$. Thus, $\hat D$ is exogenous (if $Z$ is exogenous).
-
-```{dot}
-//| fig-width: 4.1
-//| fig-height: 1
-digraph example2 {
-  bgcolor="transparent";
-  // Nodes
-  D [shape=box, pos = "0,0!", label="Part of D Explained by Z"]
-  X [shape=box, pos = "2,0!", label="(X)"]
-  Y [shape=box, pos = "1,-1!", label="Outcome (Y)"]
-  I [shape=box, pos = "1,-1!", label="Instrument (Z)"]
 
   // Edges
   {rank=same; D -> Y [label="Causal Effect"]}
@@ -132,15 +70,35 @@ digraph example2 {
 
 ```
 
+The confounder $X$ does not cause $\hat D$. Because $\hat D$ is the part of $D$ caused by $Z$.
+
+-   Thus, $X$ is no longer a confounder - since it doesn't affect selection in $\hat D$.
+
 Since $\hat D$ is exogenous and there are no more confounders between $\hat D$ and $Y$, we can calculate the causal effect of $\hat D$ on $Y$.
 
--   This is the Local Average Treatment Effect of $\hat D$ on $Y$.
+## Two-Stage Least Squares
 
--   Note: This might not be the same as the effect of $D$ on $Y$ (we are using $\hat D$, not $D$).
+The way to estimate the causal effect in IV is with 2-stage least squares (2SLS) estimator.
+
+**1st stage**: Regress $D$ on $Z$ to estimate $\hat D$.
+
+$$
+D_i = \delta + Z_i\beta + \varepsilon_i
+$$
+
+**2nd stage**: Regression $Y$ on $\hat D$ to estimate the causal effect:
+
+$$
+Y_i = \alpha + \hat D_i \tau_\text{LATE} + u_i
+$$
+
+The OLS estimate for $\tau_{LATE}$ is our causal estimate.
+
+-   Note: Standard errors will be incorrect if you manually run the two stages. Use software like **R** with **fixest** package.
 
 ## Local Average Treatment Effect
 
-The calculated treatment effect of $\hat D$ on $Y$ is called the local average treatment effect.
+The calculated treatment effect of $\hat D$ on $Y$ is called the local average treatment effect (LATE).
 
 -   Substantively, it is the causal effect of $D$ on $Y$ for the part of $D$ explained by $Z$
 
@@ -148,21 +106,9 @@ The calculated treatment effect of $\hat D$ on $Y$ is called the local average t
 
 As noted before, this might not be equal to the total average treatment effect (ATE) between $D$ and $Y$.
 
--   This has caused debates over the usefulness of the LATE of $\hat D$ on $Y$. Some believe LATE is not that useful, while others believe it is better than nothing.
+(LATE is sometimes caused the Average Causal Response if $D$ is continuous).
 
-## Requirements of a Valid Instrument
-
-For instrumental variables to work, we must have an instrument that meets 3 assumptions:
-
--   **Relevance**: $Z$ must be correlated with $D$.
-
--   **Exogeneity**: $Z$ must be exogenous/randomly assigned in respect to both $D$ and $Y$. That means no confounders between $Z$ and $Y$, and $Z$ and $D$.
-
--   **Exclusions**: $Z$ must not have a direct causal effect on $Y$ (It should have an indirect one through $D$, but no direct causal effect).
-
-The next few slides covers each in more detail.
-
-## Relevance Assumption
+## Relevance and Weak Instruments
 
 The relevance assumption is that $Z$ must be correlated with $D$.
 
@@ -185,17 +131,17 @@ digraph example2 {
 
 ```
 
-This makes sense - if $Z$ is not correlated with $D$, then no part of $D$ can be explained by $Z$.
-
-We can test relevance by running a regression of $D$ on $Z$:
+We can test relevance by running a regression of $D$ on $Z$ (which is the 1st stage of 2SLS), and see if $\beta$ is significant:
 
 $$
 D_i = \delta + Z_i\beta + \varepsilon_i
 $$
 
--   If $\beta$ is significant, relevance is met.
+If the correlation between $Z$ and $D$ is significant but weak, we have a weak instrument.
 
-Note: in the next lecture, we will discuss more issues with a weakly correlated $Z$ and $D$.
+-   If $F$ test statistic in 1st stage is lower than 10, $Z$ is weak.
+
+-   Weak instruments can have very biased $\tau_\text{LATE}$ estimates, especially in small samples.
 
 ## Exogeneity Assumption
 
@@ -226,11 +172,13 @@ digraph example2 {
 
 ```
 
-We can solve exogeniety violations by **controlling**/**accounting** for the confounders.
+We can solve exogeniety violations by **controlling**/**accounting** for the confounders. We include confounders in both stages of 2SLS:
 
--   We will cover this in the next lecture during estimation.
+-   1st stage: $D_i = \delta_0 + Z_i \delta_1 + X_i \delta_2 + \varepsilon_i$
 
-There is no real way to test exogeneity violations. The recommendation is to draw a diagram like this based on your understanding of the research topic.
+-   2nd stage: $Y_i = \alpha + \hat D_i \tau_\text{LATE} + X_i\beta + u_i$
+
+Note: panel data - include fixed effects in both stages.
 
 ## Exclusions Restriction
 
@@ -262,6 +210,26 @@ Why? Well if $Z$ has an independent effect on $Y$ outside of $D$, then $Z$ is a 
 
 There is no way to test the exclusions restriction. You can only justify it through your own understanding of the research topic in question.
 
+## Reduced Form of 2SLS
+
+The reduced form regression is the regression of $Y$ on $Z$:
+
+$$
+Y_i = \gamma_0 + Z_i \gamma_1 + \epsilon_i
+$$
+
+Assuming $Z$ is exogenous (add controls if neccesary), that means the estimate $\gamma_1$ is the causal effect of $Z$ on $Y$.
+
+-   This effect is also called the **intent-to-treat effect** $\tau_\text{ITT}$.
+
+If $Z$ and $D$ are both binary (quite common in causal inference), our LATE can also be estimated as:
+
+$$
+\tau_\text{LATE} = \frac{\tau_\text{ITT}}{Pr(\text{compliers})} = \frac{\tau_\text{ITT}}{\widehat{Cov}(D_i, Z_i)}
+$$
+
+-   This is where the interpretation of LATE as the causal effect of compliers comes from.
+
 ## Finding Valid Instruments
 
 It is difficult finding an instrument that plausibly satisfies relevance, exogeneity, and exclusions.
@@ -270,6 +238,25 @@ It is difficult finding an instrument that plausibly satisfies relevance, exogen
 
 -   However, **Exogeneity** is actually probably the more difficult assumption to meet - it is hard to find a $Z$ that is truly randomly assigned in terms of both $D$ and $Y$.
 
--   Common instruments are often random by nature: Lotteries, rainfall, natural disasters, random selection of beneficiaries for policy pilots, etc.
+-   The most reliable way to find instruments is with a non-compliance or fuzzy regression discontinuity, which we cover in lectures 9 and 11.
 
-The most reliable way to find instruments is with non-compliance or examiner designs, that we will cover in a later lecture.
+-   Other common instruments are often random by nature: Lotteries, rainfall, natural disasters, random selection of beneficiaries for policy pilots, etc.
+
+## Extension: Multiple Instruments
+
+You do not need to stick with just one valid instrument. Including more instruments has a few advantages:
+
+1.  Having multiple valid instruments provides more variation in $\hat D$, allowing for more precise (and less variance) estimates.
+2.  Multiple instruments can also be a solution for weak-instruments.
+
+**First Stage** ($p$ number of instruments):
+
+$$
+D_i = \delta_0 + \delta_1 Z_{1i} + \delta_2Z_{2i} + \dots + \delta_pZ_{pi} + \varepsilon_i
+$$
+
+**Second Stage**: remains the same.
+
+$$
+Y_i = \alpha + \hat D_i \tau_\text{LATE} + u_i
+$$

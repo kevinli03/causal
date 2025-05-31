@@ -51,48 +51,44 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 
 -   [Lecture Slides](https://kevinli03.github.io/causal/did3.pdf)
 
-#### 6. Difference-in-Differenves IV: Extensions
+#### 6. Difference-in-Differences IV: Extensions
 
 *In this lecture, I talk about extending Difference-in-differences to scenarios where parallel trends does not hold, including IFEct, MC, and synthetic controls.*
 
 -   [Lecture Slides](https://kevinli03.github.io/causal/did4.pdf)
 
-#### 7. Regression Discontinuity I: Sharp RDD
+#### 7. Instrumental Variables and 2SLS
+
+*In this lecture, I introduce the theory behind instrumental variables and why they can find causal effects, as well as the 2-stage least squares estimator.*
+
+-   [Lecture Slides](https://kevinli03.github.io/causal/iv1.pdf)
+
+#### 8. Regression Discontinuity I: Sharp RDD
 
 *In this lecture, I introduce the regression discontinuity design and its sharp variant, as well as the key identification assumptions and design of RDD*.
 
 -   [Lecture Slides](https://kevinli03.github.io/causal/rdd1.pdf)
 
-#### 8. Regression Discontinuity II: Extensions
+#### 9. Regression Discontinuity II: Extensions
 
-*In this lecture, I discuss extensions of the RDD design, including parametric estimators (linear, quadratic), as well as the regression kink design.*
+*In this lecture, I discuss extensions of the RDD design, including fuzzy RDD for non-compliance with cutoffs, and regression kink design.*
 
 -   [Lecture Slides](https://kevinli03.github.io/causal/rdd2.pdf)
 
-#### 9. Instrumental Variables I: Theory
+#### 10. Randomised Experiments I: Basics
 
-*In this lecture, I introduce the intuition behind instrumental variables, and the assumptions needed for a valid instrument.*
-
--   [Lecture Slides](https://kevinli03.github.io/causal/iv1.pdf)
-
-#### 10. Instrumental Variables II: 2SLS
-
-*In this lecture, I discuss the estimation of causal effects with instrumental variables, including the 2SLS estimator. I also discuss issues with weak instruments.*
-
--   [Lecture Slides](https://kevinli03.github.io/causal/iv2.pdf)
-
-#### 11. Instrumental Variables III: Non-Compliance
-
-*In this lecture, I introduce the most common design for instrumental variables: non-compliance. This includes non-compliance in randomised experiments, and non-compliance in regression discontinuity (Fuzzy RDD).*
+*In this lecture, I discuss the design of randomised experiments, the assumptions needed and how to check them with balance tests, and other fundamental concepts of randomisation.*
 
 -   Lecture Slides
 
-#### 12. Survey Experiments
+#### 11. Randomised Experiments II: Extensions
 
-*In this lecture, I introduce some survey experiments that involve randomisation, that are feasible for social scientists, while being able to produce useful causal effects*.
+*In this lecture, I discuss extensions to randomised experiments, including non-compliance settings and survey experiments.*
 
 -   Lecture Slides
 
- 
+#### 12. Selection on Observables
+
+*In this lecture, I introduce the least convincing, but often only plausible research design for causal inference - selection on observables. I discuss regression and matching strategies.*
 
 #### Appendix: Background Materials

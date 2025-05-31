@@ -1,6 +1,6 @@
 ---
 title: "Regression Discontinuity II: Extensions"
-subtitle: "Lecture 8 - Introduction to Causal Inference"
+subtitle: "Lecture 9 - Introduction to Causal Inference"
 author: "Kevin Li"
 format:
   beamer:
@@ -11,47 +11,61 @@ header-includes: |
 editor: visual
 ---
 
-## Parametric Estimators
+## Fuzzy Regression Discontinuity
 
-While the most common RDD estimators use the machine learning local linear regression (see last class), we can also fit a normal linear regression or polynomial on both sides of the cutoff.
+What if we have a cutoff $X=c$ that determines treatment $D$ for most units, but not all.
 
-You should generally not do this unless you have very small sample sizes, in which local linear regression performs worse.
+-   There are some people that should be treated based on the cutoff, but are "not complying" with the cutoff.
 
--   This is because local linear regression weights units closer to the cutoff more, which allows for more accurate estimation of the jump at the cutoff.
+We can instead use a **Fuzzy Regression Discontinuity**.
 
--   Normal linear models and polynomial models are also sensitive to the choices we make when modelling them - rather than local linear regression using machine learning to optimise.
+-   Basic idea: Use the cutoff $X=c$ as a **instrumental variable** for the actual treatment $D$.
 
-## Linear Parametric Model
+-   As long as the cutoff makes it more likely for someone to get treatment $D$, then the cutoff should be correlated with $D$ (relevance).
 
-We can fit linear lines on both sides of the cutoff as follows:
+## Example and Setup
+
+Example: scoring over 90% makes you **eligible** for a advanced-level class. However, you do not have to take the class.
+
+-   Issue: some people eligible for the advanced-class will decide not to take it.
+
+Our research design will be as follows:
+
+-   Cutoff $X=c$ perfectly determines the instrument $Z$ - whether you are "encouraged" to take the treatment $D$ (the advanced class).
+
+-   Treatment $D$ - whether someone actually takes the advanced class. Not all individuals "encouraged" in variable $Z$ (above the cutoff) will take it, but being above the cutoff is correlated with taking the class.
+
+## Estimation
+
+**Stage 1**: Estimate the causal effect of $Z$ on $Y$, which we call $\tau_{ITT}$
+
+-   This is done by running a Sharp regression discontinuity of cutoff $X=c$ with outcome variable $Y$ (like last lecture).
+
+**Stage 2:** Calculate Pr(compliers), the causal effect of $Z$ on $D$:
+
+-   This is done by running a Sharp regression discontinuity of cutoff $X=c$ with **outcome variable** $D$**.**
+
+**Stage 3**: Calculate $\tau_\text{LATE}$ using formula from lecture 7:
 
 $$
-Y_i = \alpha + \tau D_i + \beta_1 \tilde X_i + \beta_2 \tilde X_i D_i + \varepsilon_i
+\tau_\text{LATE} = \frac{\tau_\text{ITT}}{Pr(\text{compliers})}
 $$
 
--   The estimate of $\tau$ is our causal estimate of the LATE.
+Note: **rdrobust** package in **R** does all three steps together, which makes things very simple.
 
--   $\beta_1$ is the slope of the line fit for values $\tilde X_i < 0$ (below the cutoff, the side with no treatment).
+## Additional Notes on Fuzzy RDD
 
--   $\beta_1 + \beta_2$ is the slope of the line fit for values $\tilde X_i > 0$ (above the cutoff, the side with treatment).
+The $\tau_\text{LATE}$ of fuzzy RDD is a very narrow interpretation.
 
-The linear model also allows us to add control variables, or fixed effects if we are dealing with panel data.
+-   It is the causal effect of only **compliers** who are near the cutoff $X=c$.
 
-## Quadratic Parametric Model
+-   Basically a combination of $\tau_\text{LATE}$ interpretation from IV and RDD.
 
-Perhaps the linear lines fit on both sides don't capture the true relationship between $\tilde X$ and $Y$ well, which could result in bad estimates for the "jump" $\hat\tau$.
+Assumptions also combine RDD with IV.
 
-Instead, we can fit quadratics on both sides:
+-   We need continuity of potential outcomes of $Y$. We also need continuity in likelihood of being treated $D$ (for the second stage RDD).
 
-$$
-Y_i = \alpha + \tau D_i + \beta_1 \tilde X_i + \beta_2 \tilde X^2_i + \beta_3 \tilde X_i D_i + \beta_4 \tilde X^2_i D_i + \varepsilon
-$$
-
--   The estimate of $\tau$ is our causal estimate of the LATE.
-
--   $\beta_1\tilde X_i + \beta_2 \tilde X_i^2$ is the polynomial fit for values $\tilde X < 0$ (below the cutoff, the side with no treatment).
-
--   $(\beta_1 + \beta_3)\tilde X_i + (\beta_2 + \beta_4)\tilde X_i^2$ is the polynomial fit for values $\tilde X > 0$ (above the cutoff, the side with treatment).
+-   We need IV assumptions of exclusions, relevance, and relevance.
 
 ## Regression Kink
 
@@ -60,16 +74,6 @@ Regression Discontinuity focuses on if there is a "jump"/"discontinuity" in $Y$ 
 What if there isn't a "jump", but a change in the relationship (slope) between the running variable and outcome?
 
 ![](images/clipboard-1232748473.png){fig-align="center" width="70%"}
-
-## Example
-
-Imagine you are interested in the relationship between income ($X$) and how many hours an individual works ($Y$).
-
-Let us that individuals under $X = £40,000$ have a 20% income tax rate, while thus above have a 40% income tax rate.
-
--   We probably don't expect that right below or above £40,000, people will suddenly work significantly different hours (no jump). Thus, a discontinuity design isn't very useful.
-
--   However, we might expect that since individuals above the cutoff face higher taxes, they might have less incentive to work more - so the relationship between income $X$ and hours worked $Y$ will change.
 
 ## Regression Kink Setup
 
@@ -113,7 +117,7 @@ If this is not true (i.e. there is a "jump"/"discontinuity" in the slope/derivat
 
 ## Estimation
 
-Estimation is done in a similar way as regression discontinuity:
+Estimation is done in a similar way as sharp regression discontinuity:
 
 -   Fit a best-fit line on both sides of the cutoff.
 
