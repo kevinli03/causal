@@ -21,6 +21,10 @@ For a more detailed look at difference-in-differences, see my [repository on DiD
 
 Each lecture contains slides covering the basics of each topic. Links to additional helpful resources are included. See appendix for some background materials.
 
+#### Background: Regression Review
+
+-   [Review Slides](https://kevinli03.github.io/causal/reg.pdf)
+
 #### 1. Causal Frameworks I: Exogeneity
 
 *In this lecture, I introduce the issue of confounders in causal identification, and how it relates to randomness/exogeneity.*
@@ -84,5 +88,3 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 #### 11. Selection on Observables
 
 *In this lecture, I introduce the least convincing, but often only plausible research design for causal inference - selection on observables. I discuss regression and matching strategies.*
-
-#### Appendix: Background Materials
