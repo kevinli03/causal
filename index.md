@@ -87,6 +87,12 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 
 -   Lecture Slides
 
+#### 12. Survey Experiments
+
+*In this lecture, I introduce some survey experiments that involve randomisation, that are feasible for social scientists, while being able to produce useful causal effects*.
+
+-   Lecture Slides
+
  
 
 #### Appendix: Background Materials
