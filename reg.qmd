@@ -26,7 +26,7 @@ $$
 Fitted values (predictions, estimated best-fit line):
 
 $$
-\hat Y_i  = \hat\beta_0 + \hat\beta_1X_{i1} + \dots + \hat\beta_2 X_{i2}
+\hat Y_i  = \hat\beta_0 + \hat\beta_1X_{i1} + \dots + \hat\beta_p X_{ip}
 $$
 
 ## Vector Form
