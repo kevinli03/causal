@@ -1,0 +1,147 @@
+---
+title: "Randomised Controlled Trials"
+subtitle: "Lecture 10 - Introduction to Causal Inference"
+author: "Kevin Li"
+format:
+  beamer:
+    slide-number: true
+header-includes: |
+  \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
+  \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
+editor: visual
+---
+
+## Random Assignment
+
+In lecture 1, we briefly discussed randomised experiments: where we (as researchers) control which individuals get treatment $D$ through a random number generator.
+
+-   By randomly assigning treatment $D$, we make $D$ exogenous/random, allowing identification of causal effects.
+
+Thus, if $D$ is randomised/exogenous, a simple linear regression identifies the causal effect (ATE):
+
+$$
+Y_i = \alpha + D_i\tau_\text{ATE} + \varepsilon_i
+$$
+
+-   Use robust standard errors for inference.
+
+This lecture covers some tips/methods in implementing this design.
+
+## Assumption: Exogeneity/Independence
+
+When randomising, the assumption is we have met exogeneity (also called independence) - that $D$ is truly at-randomly assigned to individuals.
+
+-   Or more technically, $D$ is independent of potential outcomes.
+
+We can check if randomising succeded with a **balance test**, regressing each confounder $X$ against treatment $D$:
+
+$$
+X_i = \alpha +  D_i\beta + \varepsilon_i
+$$
+
+-   The estimated $\beta$ is the average difference in values of confounder $X$ between treated and control groups.
+
+We want $\beta$ to be insignificant - this shows that confounder values $X$ are approximately equal between treated and control
+
+## Blocked Experiments
+
+Sometimes, by random chance, our treatment and control group will be different from each other (and fail the balance check).
+
+This is especially likely when we have "subgroups" in our data, with vastly different characteristics.
+
+-   Example: Imagine 4 units in our study, with $X$ values of 2, 2, 8, and 8.
+
+-   Simply random assigning these 4 units to treatment control will result in the groups (2, 2) and (8, 8) being together in treatment/control 1/3 of the time (just by chance).
+
+-   This is bad - (2,2) and (8,8) are clearly treatment/control groups very different from each other. This could mean confounders are still influencing, and randomisation has failed.
+
+## Blocking and Estimation
+
+**Solution**: Blocking.
+
+1.  Divide our units into groups. In our example, divide them into (2,2), and (8,8)
+2.  Then, randomly assign each unit within each block. Ex. randomly assign 1 of (2,2) to treatment, and the other goes into control. Same for (8,8)
+3.  Result: balanced treatment-control groups of (2,8) and (2,8).
+
+To calculate the ATE, we do the following:
+
+1.  Calculate ATE for each group. In our example, calculate ATE for group (2,2), and calculate ATE for group (8,8).
+2.  The overall ATE is weighted average of group ATE's, with weights being how many observations in each group. In our example, each group has equal number of observations, so just normal average.
+
+## Non-Compliance
+
+Randomised controlled trials assume perfect compliance.
+
+-   This means if an individual is assigned to treatment, they get treated. If an individual is assigned to control, they do not get treated.
+
+But this often isn't the case. Researchers cannot force study subjects to take a medicine, or strictly follow a treatment.
+
+If there are people who do not comply, this is a **non-compliance problem**.
+
+-   Issue: What if people who do not comply are not random - but have some confounder in common between them?
+
+-   Thus, non-compliance means randomised experiments may be inaccurate.
+
+## Setup of Non-Compliance
+
+In non-compliance, we don't randomly assign treatment. Instead, we randomly assign **encouragement** $Z$ (we assign units to *encourage* them to be treated, or *encourage* them to be untreated).
+
+-   Whether units actually take their treatment status is reflected in treatment $D$.
+
+Thus, in non-compliance, we have 4 different types of individuals:
+
+1.  Compliers: individuals that listen to their encouragement. Thus, $Z = D$ always for compliers.
+2.  Always-takers: individuals that always take the treatment $D=0$, no matter encouragement $Z$.
+3.  Never-takers: the opposite of always-takers - always refuse treatment.
+4.  Defiers: Individuals who always to the opposite of their encouragement. Thus $Z≠D$ for all defiers.
+
+## Estimation in Non-Compliance
+
+Assuming encouragement $Z$ has some effect on whether individuals actually take the treatment $D$, we can estimate causal effects with Instrumental Variables.
+
+-   Encouragement $Z$ is the instrument, $D$ is the treatment. See lecture 7 for estimation of IV/2SLS.
+
+We will need to meet the standard IV assumptions: Relevance, Exogeneity (met if we randomly assign $Z$), and Exclusions.
+
+-   We also have an additional assumption: **No Defiers** (**monotonicity**). There is no way to test for this, we just have to use reasoning.
+
+Estimated $\tau_\text{LATE}$ is the causal effect of $D$ on $Y$ for **compliers** only. The reduced form estimate of $\tau_\text{ITT}$ is the effect of encouragement $Z$ on $Y$.
+
+## Survey Experiments: Vignette
+
+Survey experiments are a very cheap way to run randomised experiments. **Vignette** experiments are the most common method.
+
+-   When a respondent begins the survey, they are randomly assigned to treatment or control group.
+
+Two types of Vignette experiments:
+
+1.  **Framing**: We want to learn how phrasing a question impacts responses. Give treatment group a modified statement compared to control.
+2.  **Priming**: We want to learn how extra info impacts responses. Give treatment group extra info to read/watch.
+
+The $\tau_\text{ATE}$ is the difference in the average proportion of agreeing with the statement between treated and control groups.
+
+## Survey Experiments: List
+
+List experiments are designed to learn about sensitive attitudes/experiences that respondents might not want to share.
+
+-   Control: gets a list of statements, and asked how many statements they agree with (just total number, not which statements they agree with).
+
+-   Treatment: gets the same list of statements **plus** another sensitive statement.
+
+If respondents are randomly assigned to treatment and control groups, they should, on average, agree with the same amount of the control group's list of statements.
+
+-   Thus, any difference should indicate agreement with the sensitive statement. Divide difference by number of individuals in control group gets you proportion of agreement with sensitive statement.
+
+## Survey Experiments: Conjoint
+
+Conjoint experiments are to test how people make choices - ex. do people care more about candidate gender, policies, party, etc.
+
+-   Setup: Respondents are given profiles $A$ and $B$ (that differ on some characteristics), and they have to choose between $A$ and $B$. Do this $K$ number of times.
+
+-   Treatment: Randomly vary characteristics of $A$ and $B$.
+
+We can estimate the **average marginal component effect**, the causal effect of a particular value of some specific attribute $\ell$ on a profile on the probability that profile $j$ is chosen, holding all other attributes fixed.
+
+$$
+Y_{ijk} = \alpha + \underbrace{D_{ijk, \ell} \tau_\text{AMCE} + D_{ijk, \text{not }\ell}\gamma}_{\text{categorical variables}} + \varepsilon_{ijk}
+$$

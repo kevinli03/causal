@@ -75,19 +75,13 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 
 -   [Lecture Slides](https://kevinli03.github.io/causal/rdd2.pdf)
 
-#### 10. Randomised Experiments I: Basics
+#### 10. Randomised Controlled Trials
 
-*In this lecture, I discuss the design of randomised experiments, the assumptions needed and how to check them with balance tests, and other fundamental concepts of randomisation.*
+*In this lecture, I discuss the design of randomised experiments, including blocked experiments, non-compliance, and survey experiments.*
 
--   Lecture Slides
+-   [Lecture Slides](https://kevinli03.github.io/causal/rct.pdf)
 
-#### 11. Randomised Experiments II: Extensions
-
-*In this lecture, I discuss extensions to randomised experiments, including non-compliance settings and survey experiments.*
-
--   Lecture Slides
-
-#### 12. Selection on Observables
+#### 11. Selection on Observables
 
 *In this lecture, I introduce the least convincing, but often only plausible research design for causal inference - selection on observables. I discuss regression and matching strategies.*
 
