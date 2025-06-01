@@ -98,6 +98,20 @@ There are three causal estimands (effects we want to estimate) we are typically 
 
 We will introduce strategies to estimate these values throughout the next few classes.
 
+## Inference in Causal Inference
+
+As we discussed in the regression review (and surely in past statistics classes), statistics is about using samples to estimate parameters in a population.
+
+-   Ex. Regression uses sample to create estimates $\hat\beta$ of the true $\beta$ in the population.
+
+What is the sample and population in causal inference?
+
+-   Population is actually **all potential outcomes** (both hypothetical worlds).
+
+-   Sample is the potential outcomes we actually observe (as we do not observe counterfactuals).
+
+So depending on randomness of treatment assignment, we may observe different potential outcomes, hence different samples, hence the need for hypothesis tests/confidence intervals.
+
 ## Relationship with Exogeneity
 
 How does this definition of causal effects relate to exogeneity (which we covered last class)?
