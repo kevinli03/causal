@@ -88,3 +88,5 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 #### 11. Selection on Observables
 
 *In this lecture, I introduce the least convincing, but often only plausible research design for causal inference - selection on observables. I discuss regression and matching strategies.*
+
+-   [Lecture Slides](https://kevinli03.github.io/causal/soo.pdf)

@@ -111,3 +111,19 @@ Sensitivity analysis considers different magnitudes of parallel trends violation
 Then, it creates confidence intervals for our $\tau_\text{ATT}$ based on each magnitude of parallel trends violation. We can then see how "robust" our significant estimates are to parallel trends violations.
 
 -   If even with a potentially large parallel trends violation, our causal effect remains significant, we can be confident that our significant causal effect is true.
+
+## Sensitivity Analysis (Cont.)
+
+![](images/clipboard-1604605885.png){fig-align="center" width="70%"}
+
+$\overline M$ indicates the magnitude of parallel trend violations. For each magnitude, we have a confidence interval for the $\hat\tau_\text{ATT}$. The causal effect becomes insignificant around $\overline M > 0.7$.
+
+## Other Extensions
+
+There has been increasing work on a few extensions in DiD:
+
+1.  Continuous treatment variables. DIDmultiple (last lecture) can already accommodate continuous treatment. [Callaway et al (2024)](https://www.nber.org/papers/w32117) also have a new estimator for continuous treatment.
+
+2.  **Triple Differences (DDD)**: basically difference-in-differences but with an additional difference. Has been used for a while to adjust for concerns over confounders.
+
+3.  Other areas of research include IV-DiD, Spatial DiD, Quantile DiD, and Changes-in-Changes (CiC).
