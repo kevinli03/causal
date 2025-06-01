@@ -13,111 +13,105 @@ editor: visual
 
 ## Linear Regression
 
-For explanatory variables $X_1, X_2, \dots, X_p$, an outcome variable $Y$, for units $i = 1, 2, \dots n$:
-
+::: columns
+::: {.column width="55%"}
 $$
-Y_i = \underbrace{\beta_0 + \beta_1X_{i1} + \beta_2 X_{i2} + \dots + \beta_p X_{ip}}_{\mathbb E[Y_i|X_i]} + \varepsilon_i
-$$
-
--   $\beta_0$ is the intercept - the expected value of $Y$ when all $X=0$.
-
--   $\beta_j \in \{\beta_1, \dots, \beta_p\}$ are coefficients. For every one unit increase in $X_j$, there is an expected $\beta_j$ unit change in $Y$, holding all other explanatory variables constant.
-
-Fitted values (predictions, estimated best-fit line):
-
-$$
-\hat Y_i  = \hat\beta_0 + \hat\beta_1X_{i1} + \dots + \hat\beta_p X_{ip}
+Y_i = \underbrace{\beta_0 + \beta_1 X_i}_\text{best-fit line} + \varepsilon_i
 $$
 
-## Vector Form
+![](images/clipboard-3032815460.png){width="100%"}
+:::
 
-We can also write the same regression as:
+::: {.column width="45%"}
 
-$$
-Y_i = \mathbf X_i^\top \pmb\beta + \varepsilon_i
-$$
+$\beta_0$ is the **intercept** of the line: expected value of $Y$ when $X=0$.
 
-Where vector $\mathbf X_i$ (usually lower-case in statistics, but uppercase in causal inference) and vector $\pmb\beta$:
+&nbsp;
 
-$$
-\mathbf X_i = \begin{pmatrix}
-1 \\
-X_{i1} \\
-X_{i2} \\
-\vdots \\
-X_{ip}
-\end{pmatrix} \quad
-\pmb\beta = \begin{pmatrix}
-\beta_0 \\
-\beta_1 \\
-\beta_2 \\
-\vdots \\
-\beta_p
-\end{pmatrix}
-$$
+$\beta_1$ is the slope/**coefficient**: for a one unit increase in $X$, there is an expected $\beta_1$ change in $Y$.
 
-You can multiply this out to check it equals initial equation.
+&nbsp;
 
-## Matrix Form
+$\varepsilon_i$ is the **error**: not all data-points will be exactly on the line, and this represents how far individual $i$'s $Y$ value is from the line.
+:::
+:::
 
-We can also write the same regression as:
+## Multiple Linear Regression
+
+We can have multiple independent variables $X_1, X_2, \dots, X_p$:
 
 $$
-\mathbf y = \mathbf X \pmb\beta + \pmb\varepsilon
+Y_i = \underbrace{\beta_0 + \beta_1 X_{i1} + \beta_2X_{i2} + \dots + \beta_pX_{ip}}_\text{regression best-fit hyperplane (p-dimensional)} + \varepsilon_i
 $$
 
-Where vector $\mathbf y$, matrix $\mathbf X$, vector $\pmb\beta$, and vector $\pmb\varepsilon$ are:
+-   For any $\beta_j = \beta_1, \dots, \beta_p$: for a one unit increase in $X_j$, there is an expected $\beta_j$ change in $Y$, *holding all other independent variables constant*.
+
+We can also write the same regression in matrix form in two ways:
 
 $$
-\mathbf y = \begin{pmatrix}
-Y_1 \\
-Y_2 \\
-Y_3 \\
-\vdots \\
-Y_n
-\end{pmatrix}
-\ \mathbf X =  \begin{pmatrix}
-1 & X_{11} & X_{12} & \dots & X_{1p} \\
-1 & X_{21} & X_{22} & \dots & X_{2p} \\
-1 & X_{31} & X_{32} & \dots & X_{3p} \\
-\vdots & \vdots & \vdots & \vdots & \vdots \\
-1 & X_{n1} & X_{n2} & \dots & X_{np} \\
-\end{pmatrix}
-\ \pmb\beta = \begin{pmatrix}
-\beta_0 \\
-\beta_1 \\
-\beta_2 \\
-\vdots \\
-\beta_p
-\end{pmatrix}
-\ \pmb\varepsilon = \begin{pmatrix}
-\varepsilon_1 \\
-\varepsilon_2 \\
-\varepsilon_3 \\
-\vdots \\
-\varepsilon_n
-\end{pmatrix}
+Y_i = \mathbf X_i^\top \pmb\beta + \varepsilon_i \iff \mathbf y = \mathbf X \pmb\beta + \pmb\varepsilon
 $$
 
-(You can multiply out the vectors to see it equals the original regression for each individual $i$ in the sample)
+-   The first form is used often to shorten the long multiple regression equation. The second form is used for proofs.
+
+## Fitted Values
+
+The previous two slides introduced the **population model of regression** - i.e. the true relationship between independent and dependent variables in the population.
+
+We generally do not know the true population relationships, so we have to use our **sample** to create estimates $\hat\beta_0, \hat\beta_1, \dots, \hat\beta_p$ and $\hat\varepsilon_i$.
+
+-   Estimation procedure on the next page.
+
+Once we estimate, we can generate our "fitted" model (fitted values), which is our sample-estimated best-fit prediction line.
+
+$$
+\hat Y_i = \hat\beta_0 + \hat\beta_1 X_{i1} + \hat\beta_2 X_{i2} + \dots + \hat\beta_p X_{ip}
+$$
+
+-   No $\varepsilon_i$ in our prediction - why? On average, the prediction error should be 0, so we do not need to include it.
+
+## Estimating $\hat\beta_0, \dots, \hat\beta_p$
+
+::: columns
+::: {.column width="55%"}
+$$
+\text{Sum of Squared Errors}= \sum(Y_i - \hat Y_i)^2
+$$
+
+![](images/clipboard-3032815460.png){width="100%"}
+:::
+
+::: {.column width="45%"}
+
+We want to find values for $\hat\beta_0, \dots, \hat\beta_p$ that minimise the **sum of squared** (prediction) **errors**.
+
+&nbsp;
+
+Why squared? We don't care about positive or negative errors, just the size of errors. Squaring gets rid of sign.
+
+&nbsp;
+
+Makes sense: we want our fitted line to have as little prediction error as possible to capture the true relationships.
+:::
+:::
 
 ## OLS Estimator
 
-We want to estimate $\hat{\pmb\beta}$. How to do this? - by minimising the error (more specifically, minimise the sum of squared errors for any chosen values of $\hat{\pmb\beta}$).
-
--   What is error? It is the difference between the actual $Y_i$ value in our data, and the estimated $\hat Y_i$ by our fitted values.
+Estimating $\hat\beta_0, \dots \hat\beta_p$ by finding $\hat\beta_0, \dots, \hat\beta_p$ by minimising the sum of squared errors is called the **OLS** estimator:
 
 $$
-\text{minimise:} \quad SSE(\hat{\pmb\beta}) = (\mathbf y - \hat{\mathbf y})^\top(\mathbf y - \hat{\mathbf y})
+\text{minimise:} \quad SSE(\hat{\pmb\beta}) = \sum(Y_i - \hat Y_i)^2 = \underbrace{(\mathbf y - \hat{\mathbf y})^\top(\mathbf y - \hat{\mathbf y})}_\text{linear algebra form}
 $$
 
-1.  Multiple out the equation above.
-2.  Take the derivative in respect to vector $\hat{\pmb\beta}$.
+1.  Multiple out the linear algebra equation above.
+2.  Take the partial derivative in respect to vector $\hat{\pmb\beta}$.
 3.  Solve for $\hat{\pmb\beta}$ to get the OLS estimates that minimise the SSE:
 
 $$
 \hat{\pmb\beta} = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf y
 $$
+
+Vector $\hat{\pmb\beta}$ will contain estimated values for $\hat\beta_0, \dots, \hat\beta_p$.
 
 ## Estimators and Uncertainty
 
@@ -161,26 +155,7 @@ Violations to exogeneity are often caused by omitted confounders. Thus, ommitted
 
 ## Variance (Heteroscedasticity)
 
-In causal inference, we almost always assume heteroscedasticity. The variance of the OLS estimator under heteroscedasticity:
-
-$$
-Var(\hat{\pmb\beta}|\mathbf X) = (\mathbf X^\top\mathbf X)^{-1}\mathbf X^\top
-\underbrace{\begin{pmatrix}
-\sigma^2_1 & 0 & \dots & 0 \\
-0 & \sigma^2_2 & \dots & 0 \\
-\vdots & \dots & \ddots & 0 \\
-0 & 0& \dots & \sigma^2_i
-\end{pmatrix}}_{\varepsilon \text{ variance matrix}}
-\mathbf X(\mathbf X^\top\mathbf X)^{-1}
-$$
-
--   Where $\sigma^2_i$ is the variance of $\varepsilon_i$ term.
-
-For clustered standard errors (and other standard errors), we simply modify the variance matrix used.
-
-## Standard Errors (Heteroscedasticity)
-
-We know the variance of OLS (last slide). But there is an issue - we do not know the value of $\sigma^2_i$. Thus, we will estimate it with the residuals squared $\hat\varepsilon_i^2$ - the difference between our sample $Y_i$ and estimated $\hat Y_i$ squared.
+The estimated variance of the OLS estimator (under heteroscedasticity):
 
 $$
 \widehat{Var}(\hat{\pmb\beta}|\mathbf X) = (\mathbf X^\top\mathbf X)^{-1}\mathbf X^\top
@@ -195,18 +170,18 @@ $$
 
 The estimate of the standard error of $\hat\beta$, $\widehat{se}(\hat\beta)$, is just the square root of our estimated variance.
 
+Sometimes, we will use other standard errors, like clustered standard errors (or rarely, normal homoscedastic errors). These simply just modify the $\varepsilon$ variance matrix.
+
 ## Hypothesis Testing
 
-There is uncertainty in our estimates of $\hat\beta$. How can we be confident the true $\beta$ is different from 0 with just our estimate?
+There is uncertainty in our estimates of any coefficient $\hat\beta_j$. How do we know the true $\beta$ is **not** 0 with just our estimate (our null: $H_0 : \beta_j = 0$)?
 
--   We run a hypothesis test - Null hypothesis $H_0: \beta = 0$.
-
-We calculate a t-test statistic (why t not z? because we estimate $\sigma^2_i$ with $\hat\varepsilon_i^2$, which introduces uncertainty).
+We calculate a t-test statistic:
 
 $$
-t = \frac{\hat\beta}{\widehat{se}(\hat\beta)}
+t = \frac{\hat\beta_j}{\widehat{se}(\hat\beta_j)}
 $$
 
 Then, we use the t-test statistic and a t-distribution with $n-p-1$ degrees of freedom to calculate the **p-value**.
 
--   P-value is the probability the null hypothesis is true ($\beta =0$), given our estimate $\hat\beta$. If this probability is lower than 5%, we consider the null hypothesis unlikely, and reject the null and accept the alternate hypothesis.
+-   p-value is the probability the null is true ($\beta =0$), given our estimate $\hat\beta$. If this is lower than 5%, the null is unlikely, so we reject the null and conclude there is significant relationship between $X_j$ and $Y$.
