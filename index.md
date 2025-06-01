@@ -48,18 +48,21 @@ Each lecture contains slides covering the basics of each topic. Links to additio
 *In this lecture, I expand DiD to multiple pre-and-post periods, introduce the two-way fixed effects estimator, and discuss conditioning for parallel trends.*
 
 -   [Lecture Slides](https://kevinli03.github.io/causal/did2.pdf)
+-   [R-Code](https://kevinli03.github.io/did/twfe.html#r-setting-up-the-data)
 
 #### 5. Difference-in-Differences III: Staggered DiD
 
 *In this lecture, I expend DiD to staggered treatment settings, discuss the issues with TWFE in staggered settings, and discuss modern advances in DiD*.
 
 -   [Lecture Slides](https://kevinli03.github.io/causal/did3.pdf)
+-   [R-Code](https://kevinli03.github.io/did/)
 
 #### 6. Difference-in-Differences IV: Extensions
 
 *In this lecture, I talk about extending Difference-in-differences to scenarios where parallel trends does not hold, including IFEct, MC, and synthetic controls.*
 
 -   [Lecture Slides](https://kevinli03.github.io/causal/did4.pdf)
+-   [R-Code](https://kevinli03.github.io/did/)
 
 #### 7. Instrumental Variables and 2SLS
 
