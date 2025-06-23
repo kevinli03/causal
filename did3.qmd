@@ -23,7 +23,7 @@ Staggered DiD allows for units to adopt treatment at different times.
 
 We should create different relative time variables $R$ for each cohort, such that the initial treatment year is always $R=0$.
 
-## Issues with TWFE
+## Issue with TWFE: Forbidden Comparison
 
 We can still use TWFE in the same way as generalised DiD. However, TWFE has two issues which make it **biased (bad)** for estimating causal effects in staggered DiD.
 
@@ -62,7 +62,7 @@ Three "modern" DiD estimators do this:
 
 ## Interaction-Weighted (Sun and Abraham 2021)
 
-The interaction-weighted estimator first "matches" the correct comparisons by including interactions in TWFE:
+The interaction-weighted (IW) estimator first "matches" the correct comparisons by including interactions in TWFE:
 
 $$
 \hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + \sum_g \sum_{r≠-1} I_{itgr} \hat\tau_{g,r} + \mathbf X_{it}^\top \hat{\pmb\beta}
@@ -76,6 +76,26 @@ $$
 
 These numerous $\hat\tau_{g,r}$ for each group are then aggregated together into either a singular $\tau_\text{ATT}$, or dynamic treatment effects across groups.
 
+## IW in R
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(fixest)
+library(ggfixest)
+
+model <- feols(
+  fml  = Y ~ sunab(cohort, time) + X | unit + time,
+  data = df,
+  vcov = ~unit
+)
+aggregate(model, agg = "att") # ATT
+ggiplot(model) # dynamic effects
+```
+
+-   cohort has the value of the time period that a unit first receives treatment. For never-treated units, cohort should equal a very large or small number outside the range of the time variable.
+
 ## Doubly-Robust (Callaway and Sant'Anna 2021)
 
 The Doubly-Robust estimator does a very similar matching process of running dynamic treatment effects for each cohort group separately.
@@ -86,19 +106,59 @@ Then, these comparisons are aggregated together into either a singular $\tau_\te
 
 Since inverse probability weighting is non-parametric (i.e. it does not assume a linear relationship between confounders $X$ and outcome $Y$), the Doubly-Robust estimator can handle conditional parallel trends more flexibly.
 
-## DIDmultiple (De Chaisemartin and D’Haultfœuille 2024)
+## Doubly-Robust in R
 
-DIDmultiple is an estimator that focuses on **switchers** - those units who change their treatment status between two time periods.
+```{r}
+#| echo: true
+#| eval: false
 
-The estimator compares the change $\Delta$ in $Y$ between switchers and non-switchers in that specific two-time period window.
+library(did)
+model <- att_gt(
+  yname         = "Y",
+  tname         = "time",
+  idname        = "unit",          # must be numeric
+  gname         = "cohort",
+  base_period   = "universal",     # don't change
+  data          = df,
+  xformla       = ~ X1 + X2,       # optional
+  control_group = "nevertreated",
+  est_method    = "dr"
+)
+```
 
-$$
-\tau_t = \mathbb E[\Delta Y|\text{switchers}] - \mathbb E[\Delta Y|\text{non-switchers}]
-$$
+-   Change "dr" to "ipw" if you are having issues.
 
-These $\tau_t$ are the properly weighted together for a singular ATT or dynamic treatment effects.
+-   If small sample, change "nevertreated" to "notyettreated".
 
-The advantage of focusing on switchers: switchers can be generalised to **continuous** treatment variables $D_{it}$, making this estimator very versatile.
+## Doubly-Robust in R (Cont.)
+
+To get aggregated ATT:
+
+```{r}
+#| echo: true
+#| eval: false
+
+att <- aggte(
+  MP    = model,
+  type  = "simple",
+  na.rm = T
+)
+summary(att)
+```
+
+To get dynamic treatment effects:
+
+```{r}
+#| echo: true
+#| eval: false
+
+dynamic <- aggte(
+  MP    = csdid,
+  type  = "dynamic",
+  na.rm = T
+)
+ggdid(dynamic)
+```
 
 ## Imputation Estimators
 
@@ -132,12 +192,33 @@ Imputation estimators use untreated observations $D_{it} = 0$ to estimate $\hat\
 
 Then, they use the above equation to predict the missing counterfactual $Y_{it}(0)$ for treated units, allowing us to directly calculate treatment effects.
 
-## Matching + Reweighting or Imputation
+## Imputation in R
 
-Which type of modern DiD estimator should we use in staggered DiD?
+```{r}
+#| echo: true
+#| eval: false
+
+library(fect)
+
+model <- fect(
+  formula = Y ~ D + X1 + X2,
+  data    = df,
+  index   = c("unit", "time"),
+  method  = "fe",
+  se      = T,
+  seed    = 2342, # any number is ok
+)
+
+print(model) # ATT
+plot(model) # dynamic
+```
+
+## What Estimator to Use?
 
 -   Matching + Reweighting is more established in the econometrics literature (especially Doubly-Robust, the most common method).
 
 -   Imputation estimators are better for checking pre-treatment parallel trends. They also allow for a more granular look at causal effects (since we can estimate individual causal effects - but these can be noisy).
+
+-   Imputation estimators tend to need more pre-treatment periods to be accurate.
 
 -   It is quite common to run all of them, and report all of the results.

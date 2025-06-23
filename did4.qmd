@@ -15,26 +15,76 @@ editor: visual
 
 We have covered most of the basics of DiD. However, there are still some extensions to DiD that might deal with issues we face.
 
-In this lecture, we will cover 4 different extensions to DiD:
+In this lecture, we will cover 5 different extensions to DiD:
 
-1.  Non-Absorbing Treatment.
-2.  Weakening Parallel Trends
-3.  Abandoning Parallel Trends (Synthetic Controls)
-4.  Sensitivity Analysis
+1.  Repeated Cross-Sections
+2.  Non-Absorbing Treatment
+3.  Continuous Treatments
+4.  Weakening Parallel Trends with IFEct and MC
+5.  Sensitivity Analysis
 
-## Non-Absorbing Treatment
+## Repeated Cross-Section
+
+## Stable Composition Group Assumption
+
+## Repeated Cross-Section in R
+
+We can run a TWFE model (see lecture 2):
+
+```{r}
+#| eval: false
+#| echo: true
+
+library(fixest)
+feols(
+  fml  = Y ~ D + X1 + X2 | group + time
+  data = df,
+  vcov = ~group
+)
+```
+
+For Callaway Sant'Anna Doubly-Robust (see lecture 3), we can implement by adding this argument to the att_gt() function:
+
+```{r}
+#| eval: false
+#| echo: true
+
+panel = F
+```
+
+-   This argument gets rid of the *idname* argument.
+
+## Non-Absorbing and Continuous Treatment
 
 So far in DiD, we have assumed that once a unit gets treated, they remain treated. This is called **absorbing treatment**.
 
-But sometimes, units will become untreated. For example, maybe a State repeals a law. If this happens, we have **non-absorbing** treatment.
+But sometimes, units will become untreated later. If this happens, we have **non-absorbing** treatment.
 
 Only some estimators can deal with this:
 
 -   Imputation estimators (see last class)
 
--   DIDmultiple (see last class)
+-   DIDmultiple (later)
 
--   PanelMatch (similar to DIDmultiple, we will not disucss this).
+-   PanelMatch (we will not discuss here.).
+
+Sometimes, we will also have treatment that has more than the classic treat/control dynamic (**continuous** treatments). DIDmultiple can also deal with this.
+
+## DIDmultiple (De Chaisemartin and D’Haultfœuille 2024)
+
+DIDmultiple is an estimator that focuses on **switchers** - those units who change their treatment status between two time periods.
+
+The estimator compares the change $\Delta$ in $Y$ between switchers and non-switchers in that specific two-time period window.
+
+$$
+\tau_t = \mathbb E[\Delta Y|\text{switchers}] - \mathbb E[\Delta Y|\text{non-switchers}]
+$$
+
+These $\tau_t$ are the properly weighted together for a singular ATT or dynamic treatment effects.
+
+The advantage of focusing on switchers: switchers can be generalised to **continuous** treatment variables $D_{it}$, making this estimator very versatile.
+
+## DIDmultiple in R
 
 ## Parallel Trends Violations
 
@@ -46,7 +96,7 @@ What if even with conditioning for parallel trends, we still cannot meet the par
 
 -   We will need strategies that can still estimate with violations of parallel trends.
 
-We will first discuss weakening the parallel trends assumption, before completely dropping it.
+One way to do this is to estimate the violations of parallel trends, and then control for them.
 
 ## Interactive Fixed Effects (IFEct)
 
@@ -76,29 +126,27 @@ But it can account for some differential trends between units (parallel trends v
 
 -   We still need parallel trends for MC (like IFEct) - but the additional part makes it more likely we meet parallel trends.
 
-## Synthetic Controls Method
+## IFEct and MC in R
 
-Both IFEct and MC, while they can account for some violations in parallel trends, they still require that after accounting for those violations, parallel trends is met.
+```{r}
+#| echo: true
+#| eval: false
 
-What if we want to abandon the entire parallel trends assumption? The solution is **synthetic controls**.
+library(fect)
 
--   Setup: We have one treated unit, and a lot of untreated units with tons of pre-treatment data.
+model <- fect(
+  method  = "ife",  # change to mc or ife
+  formula = Y ~ D + X1 + X2,
+  data    = df,
+  index   = c("unit", "time"),
+  CV      = T,  # don't change
+  se      = T,
+  seed    = 2342, # any number is ok
+)
 
--   Idea: Let us use the untreated units to create a plausible counterfactual for the treated unit.
-
--   Execution: Find a weighted average of untreated units that approximate the pre-treatment $Y$ values of the treated unit. Then, use the same weighted average of untreated units to estimate the counterfactual in post-treatment periods.
-
-## Generalised Synthetic Controls
-
-Xu (2017) proposes to sort of combine DiD and synthetic controls into Generalised synthetic controls.
-
--   Instead of a weighted average of untreated units, let us create a regression model to combine untreated units to approximate the counterfactual.
-
--   This is more flexible than a weighted average, so we can create a more plausible counterfactual.
-
-Idea: estimate a IFEct model with only the untreated units (do not include the pre-treatment period of the treated units).
-
--   Also can accommodate more than just 1 treated unit, when synthetic controls only accounts for one treated unit.
+print(model) # ATT
+plot(model) # dynamic
+```
 
 ## Sensitivity Analysis
 
@@ -117,13 +165,3 @@ Then, it creates confidence intervals for our $\tau_\text{ATT}$ based on each ma
 ![](images/clipboard-1604605885.png){fig-align="center" width="70%"}
 
 $\overline M$ indicates the magnitude of parallel trend violations. For each magnitude, we have a confidence interval for the $\hat\tau_\text{ATT}$. The causal effect becomes insignificant around $\overline M > 0.7$.
-
-## Other Extensions
-
-There has been increasing work on a few extensions in DiD:
-
-1.  Continuous treatment variables. DIDmultiple (last lecture) can already accommodate continuous treatment. [Callaway et al (2024)](https://www.nber.org/papers/w32117) also have a new estimator for continuous treatment.
-
-2.  **Triple Differences (DDD)**: basically difference-in-differences but with an additional difference. Has been used for a while to adjust for concerns over confounders.
-
-3.  Other areas of research include IV-DiD, Spatial DiD, Quantile DiD, and Changes-in-Changes (CiC).

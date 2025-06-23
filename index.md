@@ -9,9 +9,7 @@ colorlinks: true
 
 ### About
 
-This is a collection of resources on Causal Inference basics and methods - with a specific focus on methods used in Political Science and Political Economy (PSPE). This is more of a broad overview of causal inference, rather than diving deep into any one method.
-
-These resources are a collection of the content I learned during my postgraduate degree at the London School of Economics.
+This is a collection of resources on Causal Inference basics and methods - with a specific focus on methods used in Political Science and Political Economy (PSPE). These resources are a collection of the content I learned during my postgraduate degree at the London School of Economics.
 
 For a more detailed look at difference-in-differences, see my [repository on DiD](https://kevinli03.github.io/did/). For more about me, see my [github page](https://kevinli03.github.io).
 
@@ -19,7 +17,7 @@ For a more detailed look at difference-in-differences, see my [repository on DiD
 
 ### Lectures and Resources
 
-Each lecture contains slides covering the basics of each topic. Links to additional helpful resources are included. See appendix for some background materials.
+Lectures contain content as well as some code syntax.
 
 #### Background: Regression Review
 

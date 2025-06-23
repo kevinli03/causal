@@ -13,7 +13,9 @@ editor: visual
 
 ## More Time Periods
 
-In Classical DiD, we have two time periods: $t = -1$ (pre-treatment) and $t=0$ (post-treatment).
+In Classical DiD, we have two time periods for units.
+
+-    $t = -1$ (pre-treatment) and $t=0$ (post-treatment).
 
 In Generalised DiD, we allow for more time periods.
 
@@ -21,17 +23,15 @@ In Generalised DiD, we allow for more time periods.
 
 -   Multiple Post-treatment periods $t = 0, 1, 2, 3, \dots$.
 
-For example, instead of only having data in March 1992 and December 1992 around the adoption of the new minimum wage in April 1992, we could also have:
+For now, we assume panel data - i.e. the observed individuals/units in our data are observed throughout each time period.
 
--   Data from 1991, 1990, 1989, etc. from before the treatment
-
--   Data from 1993, 1994, etc. after the treatment.
+-   Ex. individual $A$ has a value for each time period $\dots, -2, -1, 0, 1, 2, \dots$.
 
 ## Relative Time Periods
 
 In our data, treatment might start in any time-period, for example, the year $t=2000$.
 
-For difference-in-differences, it is standard to create a new variable called **relative time** $R$ - that indicates the time relative to initial treatment adoption for each cohort.
+It is standard to create a new variable called **relative time** $R$ - that indicates the time relative to initial treatment adoption for each cohort.
 
 -   The first treatment year in the relative time variable is always $R=0$.
 
@@ -39,11 +39,11 @@ For difference-in-differences, it is standard to create a new variable called **
 
 -   Post-treatment periods are always positive $R ≥ 0$.
 
-For the control group who do not get treated ever, there is no $R$ value for the observations. (For implementation in software, we often set it to a super large or small number).
+For the control group who do not get treated ever, there is no $R$ value for the observations.
 
 ## Dynamic Treatment Effects
 
-We can still estimate an overall $\tau_\text{ATT}$ like in classical DiD. But we can also estimate causal effects for each individual post-treatment time-period $t= 0, 1, 2, \dots$.
+We can now estimate causal effects for each individual post-treatment time-period $t= 0, 1, 2, \dots$.
 
 ```{r}
 #| warning: false
@@ -131,7 +131,7 @@ plot +
   )
 ```
 
-We don't need all periods to be estimates of 0 for parallel trends. But at least period $t=-1, -2, -3$ is ideal (a trend requires multiple periods).
+The more pre-treatment estimates being insignificant, the stronger evidence of meeting parallel trends.
 
 ## Conditional Parallel Trends
 
@@ -145,15 +145,7 @@ Generalised DiD allows us to **control/condition** for potential variables that 
 
 This allows us to apply Generalised DiD to more situations than classical DiD.
 
-## Types of Data
-
-Before we start discussing estimators, we need to distinguish the type of data we have.
-
--   **Panel Data**: This is data that observes the same individuals over multiple time periods. For example, in the New Jersey DiD example, panel data would be if we observe the same restaurants in the pre-treatment and post-treatment periods.
-
--   **Repeated Cross-Sections**: This is data that observes **different** individuals over multiple time periods. For example, in the New Jersey DiD example, repeated cross-section would be if we randomly sampled restaurants from the state in the pre-treatment and post-treatment periods. Any specific restaurant might not appear in all periods.
-
-## Two-Way Fixed Effects (Panel Data)
+## Two-Way Fixed Effects
 
 The estimator for Generalised DiD is the two-way fixed effects (TWFE) estimator. It is a linear regression:
 
@@ -165,9 +157,7 @@ $$
 
 -   $\hat\alpha_i$ and $\hat\gamma_t$ are unit and time fixed effects.
 
-The estimated $\hat\tau_\text{ATT}$ from the regression is the overall causal estimate for all post-treatment periods.
-
--   Standard errors should be clustered by units.
+The estimated $\hat\tau_\text{ATT}$ from the regression is the overall causal estimate for all post-treatment periods. Standard errors should be clustered by units.
 
 ## What are Fixed Effects
 
@@ -181,30 +171,57 @@ The only remaining potential confounders is differences in trends over time betw
 
 Thus, all confounders are controlled for, and thus, treatment $D_{it}$ is exogenous. Thus, we can find the causal effect with TWFE.
 
+## TWFE In R
+
+TWFE in R is as follows:
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(fixest)
+
+model <- feols(
+  fml  = Y ~ D + X1 + X2 | unit + time,
+  data = df,
+  vcov = ~unit
+)
+summary(model)
+```
+
+-   X1 and X2 are confounders. If no confounders, just don't include any.
+
 ## TWFE for Dynamic Treatment Effects
 
 We can also use two-way fixed effects to estimate dynamic treatment effects (post-treatment) and pre-treatment estimates.
 
 $$
-\hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + \sum_{r≠-1}I_{itr}\hat\tau_r + \mathbf X_{it}^\top \hat{\pmb\beta}
+\hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + \sum_{r≠-1}I_{itr}G_i\hat\tau_r + \mathbf X_{it}^\top \hat{\pmb\beta}
 $$
 
 -   $r$ is the specific relative time period $R$ of the observation in question (see slide 3).
 
--   $I_{itr}$ is an indicator, that takes value $I=1$ if observation $it$ is in relative time period $R=r$, and $I=0$ otherwise.
+-   $I_{itr}$ is an indicator, that takes value $I=1$ if observation $it$ is in relative time period $R=r$, and $I=0$ otherwise. $G_i$ is a treatment/control group indicator.
 
--   The $\sum_r I_{itr}$ basically says estimate a causal effect $\hat\tau_r$ for every relative time period $r$, except -1 (the last pre-treatment period). We base our parallel trends off of the last pre-treatment period, so the causal estimate for $r=-1$ is assumed to be 0.
+-   The $\sum_r I_{itr}G_i$ basically says estimate a causal effect $\hat\tau_r$ for every relative time period $r$, except -1 (the last pre-treatment period).
 
-## Repeated Cross-Section Data
+## Dynamic TWFE In R
 
-For repeated cross-section data, we replace the unit fixed effect $\hat\alpha_i$ with a group fixed effect.
+```{r}
+#| echo: true
+#| eval: false
 
--   The group should be the level of treatment assignment.
+library(fixest)
+library(ggfixest)
 
-For example, let us say we are studying how states lowering income taxes affects voter turnout.
+model <- feols(
+  fml  = Y ~ i(R, group, ref = -1) + X | unit + time,
+  data = df,
+  vcov = ~unit
+)
+ggiplot(model)
+```
 
--   We have random samples of individuals from each state, in each time period.
+-   R is the relative time period variable.
 
--   Since treatment is assigned at the state level (state income tax), we should use state fixed effects.
-
-Standard errors should be clustered by group, not units.
+-   group is a binary variable. Individuals that receive treatment at any time (treatment group) get value 1, individuals that never receive treatment (control group) get value 0.

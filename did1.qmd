@@ -208,6 +208,30 @@ The estimate of $\hat\tau_\text{ATT}$ is our DiD estimate of the causal effect. 
 
 -   Standard errors should be clustered at the group $G_i$ level.
 
+## In R
+
+Regression estimator for classical DiD:
+
+```{r}
+#| echo: true
+#| eval: false
+
+library(fixest)
+
+model <- feols(
+  fml  = Y ~ group + time + group:time,
+  data = df,
+  vcov = ~ group
+)
+summary(model)
+```
+
+-   Where group is a binary variable: treatment = 1, control = 0
+
+-   Where time is a binary variable: post-treatment = 1, pre-treatment = 0.
+
+-   Coefficient group::time in the output is the estimated ATT.
+
 ## Parallel Trends Assumption
 
 DiD depends on the parallel trends assumption.
