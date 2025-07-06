@@ -6,6 +6,8 @@ format:
   beamer:
     slide-number: true
 header-includes: |
+  \usepackage{mathastext}
+  \usepackage{upgreek}
   \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
   \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
 editor: visual
@@ -13,59 +15,59 @@ editor: visual
 
 ## Linear Regression
 
-::: columns
+::::: columns
 ::: {.column width="55%"}
 $$
-Y_i = \underbrace{\beta_0 + \beta_1 X_i}_\text{best-fit line} + \varepsilon_i
+Y_i = \underbrace{\upbeta_0 + \upbeta_1 X_i}_\text{best-fit line} + \upvarepsilon_i
 $$
 
 ![](images/clipboard-3032815460.png){width="100%"}
 :::
 
 ::: {.column width="45%"}
-$\beta_0$ is the **intercept** of the line: expected value of $Y$ when $X=0$.
+$\upbeta_0$ is the **intercept** of the line: expected value of $Y$ when $X=0$.
 
  
 
-$\beta_1$ is the slope/**coefficient**: for a one unit increase in $X$, there is an expected $\beta_1$ change in $Y$.
+$\upbeta_1$ is the slope/**coefficient**: for a one unit increase in $X$, there is an expected $\beta_1$ change in $Y$.
 
  
 
-$\varepsilon_i$ is the **error**: points will not be exactly on the line, and this represents how far individual $i$'s $Y$ value is from the line.
+$\upvarepsilon_i$ is the **error**: points will not be exactly on the line, and this represents how far individual $i$'s $Y$ value is from the line.
 :::
-:::
+:::::
 
 ## Multiple Linear Regression
 
 We can have multiple independent variables $X_1, X_2, \dots, X_p$:
 
 $$
-Y_i = \underbrace{\beta_0 + \beta_1 X_{i1} + \beta_2X_{i2} + \dots + \beta_pX_{ip}}_\text{regression best-fit hyperplane (p-dimensional)} + \varepsilon_i
+Y_i = \underbrace{\upbeta_0 + \upbeta_1 X_{i1} + \upbeta_2X_{i2} + \dots + \upbeta_pX_{ip}}_\text{regression best-fit hyperplane (p-dimensional)} + \upvarepsilon_i
 $$
 
--   For any $\beta_j = \beta_1, \dots, \beta_p$: for a one unit increase in $X_j$, there is an expected $\beta_j$ change in $Y$, *holding all other independent variables constant*.
+-   For any $\upbeta_j = \upbeta_1, \dots, \upbeta_p$: for a one unit increase in $X_j$, there is an expected $\upbeta_j$ change in $Y$, *holding all other independent variables constant*.
 
 We can also write the same regression in matrix form in two ways:
 
 $$
-Y_i = \mathbf X_i^\top \pmb\beta + \varepsilon_i \iff \mathbf y = \mathbf X \pmb\beta + \pmb\varepsilon
+Y_i = \mathbf X_i^\top \pmb{\upbeta} + \varepsilon_i \iff \mathbf y = \mathbf X \pmb{\upbeta} + \pmb{\upvarepsilon}
 $$
 
 ## Fitted Values
 
 The previous two slides introduced the **population model** - i.e. the *true* relationship between independent and dependent variables in the *population*.
 
--   We often do not observe the population, so we have to use our **sample** to create estimates $\hat\beta_0, \hat\beta_1, \dots, \hat\beta_p$ and $\hat\varepsilon_i$.
+-   We often do not observe the population, so we have to use our **sample** to create estimates $\hat{\upbeta}_0, \hat{\upbeta}_1, \dots, \hat{\upbeta}_p$ and $\hat{\upvarepsilon}_i$.
 
 -   Once we estimate with our sample, we can generate our "fitted" model (fitted values), which is our sample-estimated best-fit prediction line.
 
 $$
-\hat Y_i = \hat\beta_0 + \hat\beta_1 X_{i1} + \hat\beta_2 X_{i2} + \dots + \hat\beta_p X_{ip}
+\hat Y_i = \hat{\upbeta}_0 + \hat{\upbeta}_1 X_{i1} + \hat{\upbeta}_2 X_{i2} + \dots + \hat{\upbeta}_p X_{ip}
 $$
 
-## Estimating $\hat\beta_0, \dots, \hat\beta_p$
+## Estimating $\hat{\upbeta}_0, \dots, \hat{\upbeta}_p$
 
-::: columns
+::::: columns
 ::: {.column width="55%"}
 $$
 \text{SSE}= \sum(Y_i - \hat Y_i)^2
@@ -75,52 +77,51 @@ $$
 :::
 
 ::: {.column width="45%"}
-We want to find values for $\hat\beta_0, \dots, \hat\beta_p$ that minimise the **sum of squared** (prediction) **errors**.
+We want to find values for $\hat{\upbeta}_0, \dots, \hat{\upbeta}_p$ that minimise the **sum of squared** (prediction) **errors**.
 
  
 
 Makes sense: we want our fitted line to have as little prediction error as possible to capture the true relationships.
 
-&nbsp;
+ 
 
 Why squared? We don't care about positive or negative errors, just the size of errors.
 :::
-:::
+:::::
 
 ## OLS Estimator
 
-We want to find $\hat\beta_0, \dots, \hat\beta_p$ values that minimise the sum of squared errors:
+We want to find $\hat{\upbeta}_0, \dots, \hat{\upbeta}_p$ values that minimise the sum of squared errors:
 
 $$
-\text{minimise:} \quad SSE(\hat{\pmb\beta}) = \sum(Y_i - \hat Y_i)^2 = \underbrace{(\mathbf y - \hat{\mathbf y})^\top(\mathbf y - \hat{\mathbf y})}_\text{linear algebra form}
+\text{minimise:} \quad SSE(\hat{\pmb{\upbeta}}) = \sum(Y_i - \hat Y_i)^2 = \underbrace{(\mathbf y - \hat{\mathbf y})^\top(\mathbf y - \hat{\mathbf y})}_\text{linear algebra form}
 $$
 
-Do some linear algebra, take the derivative in respect to $\hat{\pmb\beta}$, and you will get the solutions:
+Do some linear algebra, take the derivative in respect to $\hat{\pmb{\upbeta}}$, and you will get the solutions:
 
 $$
-\hat{\pmb\beta} = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf y
+\hat{\pmb{\upbeta}} = (\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf y
 $$
 
-Vector $\hat{\pmb\beta}$ will contain estimated values for $\hat\beta_0, \dots, \hat\beta_p$.
+Vector $\hat{\pmb{\upbeta}}$ will contain estimated values for $\hat{\upbeta}_0, \dots, \hat{\upbeta}_p$.
 
 ## Estimators and Uncertainty
 
-We usually only have a sample of individuals from the population, when we estimate $\hat\beta$.
+We usually only have a sample of individuals from the population, when we estimate $\hat{\upbeta}$.
 
--   What if we had a different sample with different individuals? We would get different $\hat\beta$ estimate.
+-   What if we had a different sample with different individuals? We would get different $\hat{\upbeta}$ estimate.
 
 -   So we have to account for **sampling uncertainty**.
 
-```{=html}
 <!-- -->
-```
--   **Sampling** **distribution**: imagine you take a sample, estimate $\hat\beta$. then take another hypothetical sample, and another. The distribution of estimates is the sampling distribution.
+
+-   **Sampling** **distribution**: imagine you take a sample, estimate $\hat{\upbeta}$. then take another hypothetical sample, and another. The distribution of estimates is the sampling distribution.
 
 -   Standard deviation of a sampling distribution is the **standard error** of the estimate.
 
 ## Unbiasedness and Variance
 
-If the expected value of the sampling distribution $\mathbb E[\hat\beta]$ is equal to the true population value $\beta$ (that we do not know), then the estimator is considered **unbiased**.
+If the expected value of the sampling distribution $\mathbb E[\hat{\upbeta}]$ is equal to the true population value $\upbeta$ (that we do not know), then the estimator is considered **unbiased**.
 
 -   That means on average, any estimate with any random sample we run will have an expected value of the true population value.
 
@@ -132,93 +133,43 @@ We generally prefer unbiased estimators that have low variance.
 
 ## Gauss-Markov: Unbiasedness
 
-Gauss-Markov theorem (at least part of it) states that OLS is an unbiased estimator of the true $\hat\beta$ under the following conditions.
+Gauss-Markov theorem (at least part of it) states that OLS is an unbiased estimator of the true $\hat{\upbeta}$ under the following conditions.
 
-1.  **Linearity in parameters**: The true relationship between $X$ and $Y$ can be represented by some form of $\mathbf y = \mathbf X \pmb\beta + \pmb\varepsilon$.
+1.  **Linearity in parameters**: The true relationship between $X$ and $Y$ can be represented by some form of $\mathbf y = \mathbf X \pmb\upbeta + \pmb\varepsilon$.
 
 2.  **Random Sampling**: Random sample from a population.
 
 3.  **No Perfect Multicollineraity**: No 100% (exact) linear correlations between explanatory variables.
 
-4.  **Strict Exogeneity**: Formally defined as $\mathbb E[\pmb\varepsilon | \mathbf X] = 0$. This implies that $Cov(\varepsilon, X_j) = 0$ for any explanatory variable $X_j$. Violations to exogeneity are often caused by omitted confounders.
+4.  **Strict Exogeneity**: Formally defined as $\mathbb E[\pmb\upvarepsilon | \mathbf X] = 0$. This implies that $Cov(\upvarepsilon, X_j) = 0$ for any explanatory variable $X_j$. Violations to exogeneity are often caused by omitted confounders.
 
 ## Variance (Heteroscedasticity)
 
 The estimated variance of the OLS estimator (under heteroscedasticity):
 
 $$
-\widehat{Var}(\hat{\pmb\beta}|\mathbf X) = (\mathbf X^\top\mathbf X)^{-1}\mathbf X^\top
+\widehat{Var}(\hat{\pmb\upbeta}|\mathbf X) = (\mathbf X^\top\mathbf X)^{-1}\mathbf X^\top
 \underbrace{\begin{pmatrix}
-\hat\varepsilon^2_1 & 0 & \dots & 0 \\
-0 & \hat\varepsilon^2_2 & \dots & 0 \\
+\hat{\upvarepsilon}^2_1 & 0 & \dots & 0 \\
+0 & \hat{\upvarepsilon}^2_2 & \dots & 0 \\
 \vdots & \dots & \ddots & 0 \\
-0 & 0& \dots & \hat\varepsilon^2_i
-\end{pmatrix}}_{\varepsilon \text{ variance matrix}}
+0 & 0& \dots & \hat{\upvarepsilon}^2_i
+\end{pmatrix}}_{\upvarepsilon \text{ variance matrix}}
 \mathbf X(\mathbf X^\top\mathbf X)^{-1}
 $$
 
-The standard error estimate of $\hat\beta$, $\widehat{se}(\hat\beta)$ is the square root of the estimated variance.
+The standard error estimate of $\hat{\upbeta}$, $\widehat{se}(\hat{\upbeta})$ is the square root of the estimated variance.
 
 -   Sometimes, we will use other standard errors, like clustered standard errors. These have a different $\varepsilon$ variance matrix.
 
 ## Hypothesis Testing
 
-There is uncertainty in our estimates of any coefficient $\hat\beta_j$. How do we know the true $\beta$ is **not** 0 with just our sample estimate (our null: $H_0 : \beta_j = 0$)? We calculate a t-test statistic:
+There is uncertainty in our estimates of any coefficient $\hat{\upbeta}_j$. How do we know the true $\upbeta$ is **not** 0 with just our sample estimate (our null: $H_0 : \upbeta_j = 0$)? We calculate a t-test statistic:
 
 $$
-t = \frac{\hat\beta_j}{\widehat{se}(\hat\beta_j)}
+t = \frac{\hat{\upbeta}_j}{\widehat{se}(\hat{\upbeta}_j)}
 $$
 
 Then, we use the t-test statistic and a t-distribution with $n-p-1$ degrees of freedom to calculate the **p-value**.
 
--   p-value is the probability the null is true ($\beta =0$), given our estimate $\hat\beta$. If this is lower than 5%, the null is unlikely, so we reject the null and conclude there is significant relationship between $X_j$ and $Y$.
-
-## In R
-
-We use the **fixest** package to run regression.
-
-```{r}
-#| echo: true
-#| eval: false
-
-library(fixest)
-
-```
-
-To run a regression estimation and hypothesis testing:
-
-```{r}
-#| echo: true
-#| eval: false
-
-model <- feols(
-  fml  = Y ~ X1 + X2 + X3,
-  data = df
-)
-
-summary(model)
-```
-
-We can also visualise with a table or plot:
-
-```{r}
-#| echo: true
-#| eval: false
-
-coeftable(model)
-iplot(model)
-```
-
-## Additional Resources
-
-[Fixest Package Documentation](https://lrberge.github.io/fixest/)
-
--   a lot of great resources and functions in this package to do almost any type of regression model.
-
-[Cunningham, S. (2021) 'Probability and Regression Review', Causal Inference: The Mixtape.](https://mixtape.scunning.com/02-probability_and_regression)
-
--   A great textbook for causal inference in general - more approachable for beginners.
-
-[Wooldridge, J. (2013) *Introductory Econometrics: A Modern Approach*.](https://jaimedv.com/eco/4c1-ecomet/jeffrey-m-wooldridge--econometrics--book.pdf)
-
--   The classic econometrics textbook with more details on regression and mechanics.
+-   p-value is the probability the null is true ($\upbeta_j =0$), given our estimate $\hat{\upbeta}_j$. If this is lower than 5%, the null is unlikely, so we reject the null and conclude there is significant relationship between $X_j$ and $Y$.

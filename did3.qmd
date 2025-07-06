@@ -6,6 +6,8 @@ format:
   beamer:
     slide-number: true
 header-includes: |
+  \usepackage{mathastext}
+  \usepackage{upgreek}
   \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
   \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
 editor: visual
@@ -21,27 +23,46 @@ Staggered DiD allows for units to adopt treatment at different times.
 
 -   Perhaps one **cohort**/group of individuals start treatment in $t=0$. Another cohort/group starts in $t=2$. And so on...
 
-We should create different relative time variables $R$ for each cohort, such that the initial treatment year is always $R=0$.
+We should adjust the relative time variables $R$ for each cohort, such that the initial treatment year is always $R=0$.
+
+## TWFE Decomposition
+
+Goodman-Bacon (2021) proves that TWFE in staggered DiD is actually a weighted average of different "comparisons" between different cohorts/groups:
+
+$$
+\hat{\uptau}_\text{TWFE} = a_1 \upbeta_1 + a_2 \upbeta_2 + a_3 \upbeta_3 + \dots + a_k \upbeta_k
+$$
+
+Where $a$ are weights and $\upbeta$ are comparison estimates.
+
+Goodman-Bacon finds that you can summarise these comparisons into 3 types to get this:
+
+$$
+\hat{\uptau}_\text{TWFE} = a_1 \upbeta_\text{early vs. late} + a_2 \upbeta_\text{late vs. early} + a_3  \upbeta_\text{treat vs. control}
+$$
 
 ## Issue with TWFE: Forbidden Comparison
 
-We can still use TWFE in the same way as generalised DiD. However, TWFE has two issues which make it **biased (bad)** for estimating causal effects in staggered DiD.
+The three types of comparions that Goodman-Bacon finds are:
 
--   DiD involves comparing treated to untreated units, or untreated to untreated units (for trends).
+1.  Earlier treated units who are treated, compared with later treated units, who have yet to be treated.
+2.  Later treated units who are treated, compared with earlier treated units who are treated.
+3.  Treated units vs. units in the never-treated group.
 
--   Goodman-Bacon (2021) finds that TWFE's $\hat\tau_\text{ATT}$ in staggered DiD also compares **treated** units from earlier cohorts with **treated** units from later cohorts. (Comparing treated to treated).
+Look at comparison 2: it is actually comparing units that are treated (the later-treated ones) with units that are **already treated** (earlier treated units).
 
--   This comparison of treated to treated should not be in DiD. Thus, we consider this a "**forbidden comparison**" that can cause bias in our TWFE $\hat\tau_\text{ATT}$ estimate.
+But in DiD, we only compare treated units to control, or control units to control (for trends). So comparison 2 is a **forbidden comparison** that should not be in DiD, but TWFE includes it.
 
 ## Issue with TWFE: Negative Weighting
 
-In Staggered DiD, we are essentially running a bunch of smaller generalised DiD's for each cohort, and then combining them together into one causal estimate.
+The comparisons in TWFE are weighted together with weights $a_1, a_2, \dots$.
 
--   The weight of each cohort DiD should be based on how large that cohort is (how many observations are in the cohort).
+Logically, these comparison weights should be determined by how many observations are in each comparison. In TWFE however, comparison weights are determined by treatment timing.
 
--   But TWFE does not weight like this. It weights based on initial treatment period - earlier and later treated cohorts are given less (sometimes negative) weights.
+-   Earlier treated units and later treated units get very small (sometimes negative) weights.
+-   Units treated in the middle get the largest weights.
 
-This weighting (especially negative weighting) makes no sense, and makes our TWFE $\hat\tau_\text{ATT}$ estimates incorrect.
+Did you see the issue: **negative weights** are possible. Under no circumstance does this make any sense. Thus, TWFE can be biased.
 
 ## Solution: Matching and Reweighting
 
@@ -65,36 +86,16 @@ Three "modern" DiD estimators do this:
 The interaction-weighted (IW) estimator first "matches" the correct comparisons by including interactions in TWFE:
 
 $$
-\hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + \sum_g \sum_{r≠-1} I_{itgr} \hat\tau_{g,r} + \mathbf X_{it}^\top \hat{\pmb\beta}
+Y_{itgr} = \hat{\upalpha}_i + \hat{\updelta}_t + \sum_g \sum_{r≠-1} 1\{G_{ig} = g\} \cdot 1\{R_{itgr} = r\} \cdot \hat{\uptau}_{g, r} + \hat{\upvarepsilon}_{it} 
 $$
 
--   $\sum_r I_{itr}$ is the same as dynamic treatment effects in TWFE.
+-   $\sum_r$ is the same as dynamic treatment effects in TWFE.
 
--   $\sum_g I_{itg}$ tells us to do $\sum_r I_{itr}$ for all different cohorts/groups $g$.
+-   $\sum_g$ tells us to do \$\\sum_r \$ for all different cohorts/groups $g$.
 
 -   Basically, we are estimating dynamic treatment effects for each cohort separately.
 
-These numerous $\hat\tau_{g,r}$ for each group are then aggregated together into either a singular $\tau_\text{ATT}$, or dynamic treatment effects across groups.
-
-## IW in R
-
-```{r}
-#| echo: true
-#| eval: false
-
-library(fixest)
-library(ggfixest)
-
-model <- feols(
-  fml  = Y ~ sunab(cohort, time) + X | unit + time,
-  data = df,
-  vcov = ~unit
-)
-aggregate(model, agg = "att") # ATT
-ggiplot(model) # dynamic effects
-```
-
--   cohort has the value of the time period that a unit first receives treatment. For never-treated units, cohort should equal a very large or small number outside the range of the time variable.
+These numerous $\hat{\uptau}_{g,r}$ are aggregated into either a singular $\tau_\text{ATT}$, or dynamic treatment effects across groups.
 
 ## Doubly-Robust (Callaway and Sant'Anna 2021)
 
@@ -105,60 +106,6 @@ However, instead of relying solely on regression, Doubly-Robust relies on both i
 Then, these comparisons are aggregated together into either a singular $\tau_\text{ATT}$, or dynamic treatment effects.
 
 Since inverse probability weighting is non-parametric (i.e. it does not assume a linear relationship between confounders $X$ and outcome $Y$), the Doubly-Robust estimator can handle conditional parallel trends more flexibly.
-
-## Doubly-Robust in R
-
-```{r}
-#| echo: true
-#| eval: false
-
-library(did)
-model <- att_gt(
-  yname         = "Y",
-  tname         = "time",
-  idname        = "unit",          # must be numeric
-  gname         = "cohort",
-  base_period   = "universal",     # don't change
-  data          = df,
-  xformla       = ~ X1 + X2,       # optional
-  control_group = "nevertreated",
-  est_method    = "dr"
-)
-```
-
--   Change "dr" to "ipw" if you are having issues.
-
--   If small sample, change "nevertreated" to "notyettreated".
-
-## Doubly-Robust in R (Cont.)
-
-To get aggregated ATT:
-
-```{r}
-#| echo: true
-#| eval: false
-
-att <- aggte(
-  MP    = model,
-  type  = "simple",
-  na.rm = T
-)
-summary(att)
-```
-
-To get dynamic treatment effects:
-
-```{r}
-#| echo: true
-#| eval: false
-
-dynamic <- aggte(
-  MP    = csdid,
-  type  = "dynamic",
-  na.rm = T
-)
-ggdid(dynamic)
-```
 
 ## Imputation Estimators
 
@@ -179,46 +126,15 @@ Why don't we estimate it for every treated unit? This is called imputation. Seve
 The TWFE model looks like this:
 
 $$
-\hat Y_{it} = \hat\alpha_i + \hat\gamma_t + D_{it} \hat\tau_\text{ATT} + \mathbf X_{it}^\top\hat{\pmb\beta}
+Y_{it} = \hat{\upalpha}_i + \hat{\updelta}_t + D_{it} \hat{\uptau} + \hat{\upvarepsilon}_{it}
 $$
 
 If we plug in $D_{it} = 0$, then we can estimate the value of $Y_{it}$ if a unit had no treatment, which is the missing $Y_{it}(0)$:
 
 $$
-\hat Y_{it}(0) = \hat\alpha_i + \hat\gamma_t + \mathbf X_{it}^\top\hat{\pmb\beta}
+\hat Y_{it}(0) = \hat{\upalpha}_i + \hat{\updelta}_t
 $$
 
-Imputation estimators use untreated observations $D_{it} = 0$ to estimate $\hat\alpha_i$, $\hat\gamma_t$, and $\hat{\pmb\beta}$.
+Imputation estimators use untreated observations $D_{it} = 0$ to estimate $\hat{\upalpha}_i$ and $\hat{\updelta}_t$. We can also include covariates.
 
 Then, they use the above equation to predict the missing counterfactual $Y_{it}(0)$ for treated units, allowing us to directly calculate treatment effects.
-
-## Imputation in R
-
-```{r}
-#| echo: true
-#| eval: false
-
-library(fect)
-
-model <- fect(
-  formula = Y ~ D + X1 + X2,
-  data    = df,
-  index   = c("unit", "time"),
-  method  = "fe",
-  se      = T,
-  seed    = 2342, # any number is ok
-)
-
-print(model) # ATT
-plot(model) # dynamic
-```
-
-## What Estimator to Use?
-
--   Matching + Reweighting is more established in the econometrics literature (especially Doubly-Robust, the most common method).
-
--   Imputation estimators are better for checking pre-treatment parallel trends. They also allow for a more granular look at causal effects (since we can estimate individual causal effects - but these can be noisy).
-
--   Imputation estimators tend to need more pre-treatment periods to be accurate.
-
--   It is quite common to run all of them, and report all of the results.

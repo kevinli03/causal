@@ -6,6 +6,8 @@ format:
   beamer:
     slide-number: true
 header-includes: |
+  \usepackage{mathastext}
+  \usepackage{upgreek}
   \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
   \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
 editor: visual
@@ -74,7 +76,7 @@ Why? Something could have happened between March and December, like a recession 
 We can also think of this issue in terms of potential outcomes. Our causal effect in December 1992 is:
 
 $$
-\text{Average }\tau_\text{Dec} = \overline Y_\text{Dec}(1) - \overline Y_\text{Dec}(0)
+\uptau_\text{Dec} = \overline Y_\text{Dec}(1) - \overline Y_\text{Dec}(0)
 $$
 
 But we do not observe $\overline Y_\text{Dec}(0)$ since New Jersey is treated in Dec.
@@ -183,7 +185,7 @@ We have 2 time periods.
 The DiD estimate for the causal effect is:
 
 $$
-\hat\tau_\text{ATT} = \underbrace{\left(\overline Y^{(G=1)}_{t=0} - \overline Y^{(G=1)}_{t=-1}\right)}_\text{Diff. for treated group} - \underbrace{\left(\overline Y^{(G=0)}_{t=0} - \overline Y^{(G=0)}_{t=-1}\right)}_\text{Diff. for control group} 
+\hat{\uptau}_\text{ATT} = \underbrace{\left(\overline Y^{(G=1)}_{t=0} - \overline Y^{(G=1)}_{t=-1}\right)}_\text{Diff. for treated group} - \underbrace{\left(\overline Y^{(G=0)}_{t=0} - \overline Y^{(G=0)}_{t=-1}\right)}_\text{Diff. for control group} 
 $$
 
 -   The first part is the difference in average $Y$ between time periods for the treated group $G=1$.
@@ -197,40 +199,16 @@ The total causal effect is the difference of these two differences. Hence, diffe
 We can also use a regression estimator, which makes calculating standard errors simpler:
 
 $$
-\hat Y_{it} = \hat\alpha +  G_i\hat \gamma +  T_{it}\hat\delta + G_iT_{it} \hat\tau_\text{ATT}
+\hat Y_{it} = \hat{\upalpha} +  G_i\hat{\upgamma} +  T_{it}\hat{\updelta} + G_iT_{it} \hat{\uptau}
 $$
 
 -   $G_{i}$ is the binary variable indicating the group for the unit (treated, control)
 
 -   $T_{it}$ is the binary variable indicating the time period for the observation.
 
-The estimate of $\hat\tau_\text{ATT}$ is our DiD estimate of the causal effect. It will be equal to the estimate from the equation on the last side.
+The estimate of $\hat{\uptau}$ is our DiD estimate of the causal effect. It will be equal to the estimate from the equation on the last side.
 
 -   Standard errors should be clustered at the group $G_i$ level.
-
-## In R
-
-Regression estimator for classical DiD:
-
-```{r}
-#| echo: true
-#| eval: false
-
-library(fixest)
-
-model <- feols(
-  fml  = Y ~ group + time + group:time,
-  data = df,
-  vcov = ~ group
-)
-summary(model)
-```
-
--   Where group is a binary variable: treatment = 1, control = 0
-
--   Where time is a binary variable: post-treatment = 1, pre-treatment = 0.
-
--   Coefficient group::time in the output is the estimated ATT.
 
 ## Parallel Trends Assumption
 

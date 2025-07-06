@@ -6,6 +6,8 @@ format:
   beamer:
     slide-number: true
 header-includes: |
+  \usepackage{mathastext}
+  \usepackage{upgreek}
   \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
   \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
 editor: visual
@@ -25,34 +27,23 @@ In this lecture, we will cover 5 different extensions to DiD:
 
 ## Repeated Cross-Section
 
+So far, we have used panel data - when we observe the same units i over multiple time periods t.
+
+Sometimes, we will have observations over many time periods t, but not of the same units.
+
+For example, lets say we are using a survey of Americans, that happens each year. Each year t will have a different sample of individuals. This is repeated cross-section.
+
+We can use DID in repeated cross-section, if units are sampled from some control group and treatment group (like lets say state gets a policy - sample from individuals within the treated state, and the control state).
+
 ## Stable Composition Group Assumption
 
-## Repeated Cross-Section in R
+**Issue**: If our sample from different time periods t differs on key confounders for outcome Y, then we will not know if our causal estimates are accurate, since the changes in confounders may cause changes in Y.
 
-We can run a TWFE model (see lecture 2):
+**Solution**: we must ensure that in terms of key confounders for Y, the sampled individuals from each time period t is consistent.
 
-```{r}
-#| eval: false
-#| echo: true
+-   If it is not consistent, we can control for observable confounders in our regression, just like we would for conditional parallel trends.
 
-library(fixest)
-feols(
-  fml  = Y ~ D + X1 + X2 | group + time
-  data = df,
-  vcov = ~group
-)
-```
-
-For Callaway Sant'Anna Doubly-Robust (see lecture 3), we can implement by adding this argument to the att_gt() function:
-
-```{r}
-#| eval: false
-#| echo: true
-
-panel = F
-```
-
--   This argument gets rid of the *idname* argument.
+Note: this is a relatively new area of research - very few papers combine conditional parallel trends with controls for stable group composition.
 
 ## Non-Absorbing and Continuous Treatment
 
@@ -66,7 +57,7 @@ Only some estimators can deal with this:
 
 -   DIDmultiple (later)
 
--   PanelMatch (we will not discuss here.).
+-   PanelMatch (we will not discuss here, extensino of DIDmultiple).
 
 Sometimes, we will also have treatment that has more than the classic treat/control dynamic (**continuous** treatments). DIDmultiple can also deal with this.
 
@@ -77,14 +68,12 @@ DIDmultiple is an estimator that focuses on **switchers** - those units who chan
 The estimator compares the change $\Delta$ in $Y$ between switchers and non-switchers in that specific two-time period window.
 
 $$
-\tau_t = \mathbb E[\Delta Y|\text{switchers}] - \mathbb E[\Delta Y|\text{non-switchers}]
+\uptau_t = \mathbb E[\Delta Y|\text{switchers}] - \mathbb E[\Delta Y|\text{non-switchers}]
 $$
 
 These $\tau_t$ are the properly weighted together for a singular ATT or dynamic treatment effects.
 
 The advantage of focusing on switchers: switchers can be generalised to **continuous** treatment variables $D_{it}$, making this estimator very versatile.
-
-## DIDmultiple in R
 
 ## Parallel Trends Violations
 
@@ -103,50 +92,22 @@ One way to do this is to estimate the violations of parallel trends, and then co
 Liu, Xu, and Wang propose a modified imputation estimator:
 
 $$
-Y_{it}(0) = \underbrace{\hat\alpha_i + \hat\gamma_t + \mathbf X_{it}^\top\hat{\pmb\beta}}_\text{TWFE imputation} + \ \hat{\pmb\lambda}_i^\top\hat{\pmb\xi}_t
+\hat Y_{it}(0) = \hat{\upalpha}_i + \hat{\updelta}_t + \ \hat{\pmb\uplambda}_i^\top\hat{\mathbf f}_t
 $$
 
--   $\hat{\pmb\xi}_t$ is a vector of time-varying latent (unobserved) variables that IFEct estimates.
+-   $\hat{\mathbf f}_t$ is a vector of time-varying latent (unobserved) variables that IFEct estimates.
 
--   $\hat{\pmb\lambda}_i$ is a vector of how each unit $i$ is affected by each of the time-varying latent variables.
+-   $\hat{\pmb\uplambda}_i$ is a vector of how each unit $i$ is affected by each of the time-varying latent variables.
 
-**Summary**: This additional $\hat{\pmb\lambda}_i^\top\hat{\pmb\xi}_t$ allows IFEct to account for some differential trends between units (parallel trends violations). We still need parallel trends for IFEct - but the additional part makes it more likely we meet parallel trends.
+**Summary**: This additional $\hat{\pmb\uplambda}_i^\top\hat{\mathbf f}_t$ allows IFEct to account for some differential trends between units (parallel trends violations). We still need parallel trends for IFEct - but the additional part makes it more likely we meet parallel trends.
 
 ## Matrix Completion (MC)
 
-Athey et al (2021) propose another extension on imputation estimators:
+Athey et al (2021) propose another extension on imputation estimators. Imagine a matrix $\mathbf{Y(0)}$ of potential outcomes, where $Y_{it}(0)$ is in row $i$ and column $t$. This matrix $\mathbf{Y(0)}$ has missing values for the units that are treated (that we need to impute to estimate causal effects).
 
-$$
-\mathbf{Y(0)} = \mathbf X\hat{\pmb\beta} + \hat{\mathbf L}
-$$
+Idea: assume there are patterns in $\mathbf{Y(0)}$, or in other words, assume it is a low-rank matrix. Low rank matrix can be estimated as product of two matrices $\mathbf{Y(0)} = \pmb \Lambda \mathbf F$, where $\mathbf F$ is a matrix of multiple $\mathbf f_t$ from IFEct (last slide), and $\pmb \Lambda$ is a matrix of $\pmb\uplambda_i$.
 
-The way this estimator works is kind of complicated - and uses computer science/machine learning principles.
-
-But it can account for some differential trends between units (parallel trends violations).
-
--   We still need parallel trends for MC (like IFEct) - but the additional part makes it more likely we meet parallel trends.
-
-## IFEct and MC in R
-
-```{r}
-#| echo: true
-#| eval: false
-
-library(fect)
-
-model <- fect(
-  method  = "ife",  # change to mc or ife
-  formula = Y ~ D + X1 + X2,
-  data    = df,
-  index   = c("unit", "time"),
-  CV      = T,  # don't change
-  se      = T,
-  seed    = 2342, # any number is ok
-)
-
-print(model) # ATT
-plot(model) # dynamic
-```
+Using iterative algorithm for matrix completion methods, and regularisation to prevent overfitting, we can estimate missing entries in the matrix.
 
 ## Sensitivity Analysis
 

@@ -6,6 +6,8 @@ format:
   beamer:
     slide-number: true
 header-includes: |
+  \usepackage{mathastext}
+  \usepackage{upgreek}
   \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
   \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
 editor: visual
@@ -37,7 +39,7 @@ Our research design will be as follows:
 
 ## Estimation
 
-**Stage 1**: Estimate the causal effect of $Z$ on $Y$, which we call $\tau_{ITT}$
+**Stage 1**: Estimate the causal effect of $Z$ on $Y$, which we call $\uptau_{ITT}$
 
 -   This is done by running a Sharp regression discontinuity of cutoff $X=c$ with outcome variable $Y$ (like last lecture).
 
@@ -45,17 +47,17 @@ Our research design will be as follows:
 
 -   This is done by running a Sharp regression discontinuity of cutoff $X=c$ with **outcome variable** $D$**.**
 
-**Stage 3**: Calculate $\tau_\text{LATE}$ using formula from lecture 7:
+**Stage 3**: Calculate $\uptau_\text{LATE}$ using formula from lecture 7:
 
 $$
-\tau_\text{LATE} = \frac{\tau_\text{ITT}}{Pr(\text{compliers})}
+\uptau_\text{LATE} = \frac{\uptau_\text{ITT}}{Pr(\text{compliers})}
 $$
 
 Note: **rdrobust** package in **R** does all three steps together, which makes things very simple.
 
 ## Additional Notes on Fuzzy RDD
 
-The $\tau_\text{LATE}$ of fuzzy RDD is a very narrow interpretation.
+The $\uptau_\text{LATE}$ of fuzzy RDD is a very narrow interpretation.
 
 -   It is the causal effect of only **compliers** who are near the cutoff $X=c$.
 

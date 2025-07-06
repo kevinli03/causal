@@ -6,6 +6,8 @@ format:
   beamer:
     slide-number: true
 header-includes: |
+  \usepackage{mathastext}
+  \usepackage{upgreek}
   \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
   \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
 editor: visual
@@ -83,16 +85,16 @@ The way to estimate the causal effect in IV is with 2-stage least squares (2SLS)
 **1st stage**: Regress $D$ on $Z$ to estimate $\hat D$.
 
 $$
-D_i = \delta + Z_i\beta + \varepsilon_i
+D_i = \updelta + Z_i\upbeta + \upvarepsilon_i
 $$
 
 **2nd stage**: Regression $Y$ on $\hat D$ to estimate the causal effect:
 
 $$
-Y_i = \alpha + \hat D_i \tau_\text{LATE} + u_i
+Y_i = \upalpha + \hat D_i \uptau + u_i
 $$
 
-The OLS estimate for $\tau_{LATE}$ is our causal estimate.
+The OLS estimate for $\uptau$ is our causal estimate.
 
 -   Note: Standard errors will be incorrect if you manually run the two stages. Use software like **R** with **fixest** package.
 
@@ -113,17 +115,17 @@ As noted before, this might not be equal to the total average treatment effect (
 The reduced form regression is the regression of $Y$ on $Z$:
 
 $$
-Y_i = \gamma_0 + Z_i \gamma_1 + \epsilon_i
+Y_i = \upgamma_0 + Z_i \upgamma_1 + \upepsilon_i
 $$
 
 Assuming $Z$ is exogenous (add controls if neccesary), that means the estimate $\gamma_1$ is the causal effect of $Z$ on $Y$.
 
--   This effect is also called the **intent-to-treat effect** $\tau_\text{ITT}$.
+-   This effect is also called the **intent-to-treat effect** $\uptau_\text{ITT}$.
 
 If $Z$ and $D$ are both binary (quite common in causal inference), our LATE can also be estimated as:
 
 $$
-\tau_\text{LATE} = \frac{\tau_\text{ITT}}{Pr(\text{compliers})} = \frac{\tau_\text{ITT}}{\widehat{Cov}(D_i, Z_i)}
+\uptau_\text{LATE} = \frac{\uptau_\text{ITT}}{Pr(\text{compliers})} = \frac{\uptau_\text{ITT}}{\widehat{Cov}(D_i, Z_i)}
 $$
 
 -   This is where the interpretation of LATE as the causal effect of compliers comes from.
@@ -151,17 +153,17 @@ digraph example2 {
 
 ```
 
-We can test relevance by running a regression of $D$ on $Z$ (which is the 1st stage of 2SLS), and see if $\beta$ is significant:
+We can test relevance by running a regression of $D$ on $Z$ (which is the 1st stage of 2SLS), and see if $\upbeta$ is significant:
 
 $$
-D_i = \delta + Z_i\beta + \varepsilon_i
+D_i = \updelta + Z_i\upbeta + \upvarepsilon_i
 $$
 
 If the correlation between $Z$ and $D$ is significant but weak, we have a weak instrument.
 
 -   If $F$ test statistic in 1st stage is lower than 10, $Z$ is weak.
 
--   Weak instruments can have very biased $\tau_\text{LATE}$ estimates, especially in small samples.
+-   Weak instruments can have very biased $\uptau_\text{LATE}$ estimates, especially in small samples.
 
 ## Exogeneity Assumption
 
@@ -194,9 +196,9 @@ digraph example2 {
 
 We can solve exogeniety violations by **controlling**/**accounting** for the confounders. We include confounders in both stages of 2SLS:
 
--   1st stage: $D_i = \delta_0 + Z_i \delta_1 + X_i \delta_2 + \varepsilon_i$
+-   1st stage: $D_i = \updelta_0 + Z_i \updelta_1 + X_i \updelta_2 + \upvarepsilon_i$
 
--   2nd stage: $Y_i = \alpha + \hat D_i \tau_\text{LATE} + X_i\beta + u_i$
+-   2nd stage: $Y_i = \upalpha + \hat D_i \uptau_\text{LATE} + X_i\upbeta + u_i$
 
 Note: panel data - include fixed effects in both stages.
 
@@ -252,11 +254,11 @@ You do not need to stick with just one valid instrument. Including more instrume
 **First Stage** ($p$ number of instruments):
 
 $$
-D_i = \delta_0 + \delta_1 Z_{1i} + \delta_2Z_{2i} + \dots + \delta_pZ_{pi} + \varepsilon_i
+D_i = \updelta_0 + \updelta_1 Z_{1i} + \updelta_2Z_{2i} + \dots + \updelta_pZ_{pi} + \upvarepsilon_i
 $$
 
 **Second Stage**: remains the same.
 
 $$
-Y_i = \alpha + \hat D_i \tau_\text{LATE} + u_i
+Y_i = \upalpha + \hat D_i \uptau_\text{LATE} + u_i
 $$

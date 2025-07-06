@@ -6,6 +6,8 @@ format:
   beamer:
     slide-number: true
 header-includes: |
+  \usepackage{mathastext}
+  \usepackage{upgreek}
   \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
   \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
 editor: visual
@@ -13,7 +15,7 @@ editor: visual
 
 ## What is Causal Inference?
 
-In causal inference, we are interested in how treatment $D$ affects outcome $Y$.
+In causal inference, we are interested in how treatment D affects outcome Y.
 
 ```{dot}
 //| fig-width: 3.5
@@ -194,7 +196,7 @@ Downside: we have to be able to control who gets treatment and who does not, so 
 We can also achieve exogeneity if we include every single possible confounder in our regression with our treatment:
 
 $$
-Y_i = \alpha + D_i\tau + \mathbf X_{i}^\top\pmb\beta + \varepsilon_i
+Y_i = \upalpha + D_i\uptau + \mathbf X_{i}^\top\pmb{\upbeta} + \upvarepsilon_i
 $$
 
 -   Where $\mathbf X_i$ is a vector of values for all confounders for unit $i$.

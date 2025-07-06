@@ -6,6 +6,8 @@ format:
   beamer:
     slide-number: true
 header-includes: |
+  \usepackage{mathastext}
+  \usepackage{upgreek}
   \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
   \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
 editor: visual
@@ -20,7 +22,7 @@ In lecture 1, we briefly discussed randomised experiments: where we (as research
 Thus, if $D$ is randomised/exogenous, a simple linear regression identifies the causal effect (ATE):
 
 $$
-Y_i = \alpha + D_i\tau_\text{ATE} + \varepsilon_i
+Y_i = \upalpha + D_i\uptau + \upvarepsilon_i
 $$
 
 -   Use robust standard errors for inference.
@@ -36,7 +38,7 @@ When randomising, the assumption is we have met exogeneity (also called independ
 We can check if randomising succeded with a **balance test**, regressing each confounder $X$ against treatment $D$:
 
 $$
-X_i = \alpha +  D_i\beta + \varepsilon_i
+X_i = \upalpha +  D_i\upbeta + \upvarepsilon_i
 $$
 
 -   The estimated $\beta$ is the average difference in values of confounder $X$ between treated and control groups.
@@ -143,5 +145,5 @@ Conjoint experiments are to test how people make choices - ex. do people care mo
 We can estimate the **average marginal component effect**, the causal effect of a particular value of some specific attribute $\ell$ on a profile on the probability that profile $j$ is chosen, holding all other attributes fixed.
 
 $$
-Y_{ijk} = \alpha + \underbrace{D_{ijk, \ell} \tau_\text{AMCE} + D_{ijk, \text{not }\ell}\gamma}_{\text{categorical variables}} + \varepsilon_{ijk}
+Y_{ijk} = \upalpha + \underbrace{D_{ijk, \ell} \uptau_\text{AMCE} + D_{ijk, \text{not }\ell}\upgamma}_{\text{categorical variables}} + \upvarepsilon_{ijk}
 $$

@@ -6,6 +6,8 @@ format:
   beamer:
     slide-number: true
 header-includes: |
+  \usepackage{mathastext}
+  \usepackage{upgreek}
   \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
   \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
 editor: visual
@@ -107,11 +109,11 @@ Local Linear Regression differs from normal linear regression, because we can we
 
 ## Local Average Treatment Effect
 
-What is the estimated $\hat\tau$ we get from looking at the jump/discontinuity? It is the **local average treatment effect** (LATE)
+What is the estimated $\hat{\uptau}$ we get from looking at the jump/discontinuity? It is the **local average treatment effect** (LATE)
 
 Recall the LATE is the average treatment effect for a set of individuals $i$ who meet a set of criteria.
 
--   In RDD, the estimated $\hat\tau$ is the average treatment effect for the units **exactly at the cutoff** $X=c$.
+-   In RDD, the estimated $\hat{\uptau}$ is the average treatment effect for the units **exactly at the cutoff** $X=c$.
 
 -   We can usually generalise the LATE to individuals nearby the cutoff $X=c$ with no issues.
 
@@ -134,13 +136,13 @@ There is a tradeoff in selecting bandwidths (how much data around the cutoff to 
 Generally, we prefer the local regression (machine learning) approach unless we have very mimimal data. But we can fit normal linear regression lines on both sides of the cutoff as follows:
 
 $$
-Y_i = \alpha + \tau D_i + \beta_1 \tilde X_i + \beta_2 \tilde X_i D_i + \varepsilon_i
+Y_i = \upalpha + \uptau D_i + \upbeta_1 \tilde X_i + \upbeta_2 \tilde X_i D_i + \upvarepsilon_i
 $$
 
--   The estimate of $\tau$ is our causal estimate of the LATE.
+-   The estimate of $\uptau$ is our causal estimate of the LATE.
 
--   $\beta_1$ is the slope of the line fit for values $\tilde X_i < 0$ (below the cutoff, the side with no treatment).
+-   $\upbeta_1$ is the slope of the line fit for values $\tilde X_i < 0$ (below the cutoff, the side with no treatment).
 
--   $\beta_1 + \beta_2$ is the slope of the line fit for values $\tilde X_i > 0$ (above the cutoff, the side with treatment).
+-   $\upbeta_1 + \upbeta_2$ is the slope of the line fit for values $\tilde X_i > 0$ (above the cutoff, the side with treatment).
 
 We can also fit polynomials in a similar way (for quadratic: two terms $\tilde X$ and $\tilde X^2$, then the same two terms interacted with $D$).

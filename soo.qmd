@@ -6,6 +6,8 @@ format:
   beamer:
     slide-number: true
 header-includes: |
+  \usepackage{mathastext}
+  \usepackage{upgreek}
   \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
   \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
 editor: visual
@@ -38,7 +40,7 @@ Conditional independence is very hard to meet - you need every possible confound
 One (simple and common) way to control for confounders is regression:
 
 $$
-Y_i = \hat\alpha + D_i\hat\tau_\text{ATE} + \mathbf X_i^\top \hat{\pmb\beta} + \hat\varepsilon_i
+Y_i = \hat{\upalpha} + D_i\hat{\uptau} + \mathbf X_i^\top \hat{\pmb\upbeta} + \hat{\upvarepsilon}_i
 $$
 
 Linear regression assumes a linear relationship between independent and dependent variables.
@@ -49,19 +51,19 @@ Linear regression assumes a linear relationship between independent and dependen
 
 ## Regression and Heterogeneity Issues
 
-When we hold confounders constant, treatment is exogeneous. Thus, $\tau_\text{ATE} | \mathbf X$ (effect given confounders $\mathbf X$) is identified. To get the overall $\tau_\text{ATE}$, we weight all of $\tau_\text{ATE} | \mathbf X$ for each value of $\mathbf X$ together:
+When we hold confounders constant, treatment is exogeneous. Thus, $\uptau_\text{ATE} | \mathbf X$ (effect given confounders $\mathbf X$) is identified. To get the overall $\uptau_\text{ATE}$, we weight all of $\uptau_\text{ATE} | \mathbf X$ for each value of $\mathbf X$ together:
 
 $$
-\tau_\text{ATE} = \underbrace{\int (\tau_\text{ATE}| \mathbf X) \cdot d \ Pr(\mathbf X)}_{\text{weighted average of }\tau|\mathbf X}
+\uptau_\text{ATE} = \underbrace{\int (\uptau_\text{ATE}| \mathbf X) \cdot d \ Pr(\mathbf X)}_{\text{weighted average of }\uptau|\mathbf X}
 $$
 
 Issue: Angrist (1998) show that OLS estimate of $\tau$ equals:
 
 $$
-\tau_\text{OLS} = \int (\tau_\text{ATE}|\mathbf X) \cdot d \ \underbrace{\frac{Var(D_i|\mathbf X_i)Pr(\mathbf X_i)}{\sum_{\mathbf X^c} Var(D_i|\mathbf X^c) Pr(\mathbf X^c) }}_\text{weight}
+\uptau_\text{OLS} = \int (\uptau_\text{ATE}|\mathbf X) \cdot d \ \underbrace{\frac{Var(D_i|\mathbf X_i)Pr(\mathbf X_i)}{\sum_{\mathbf X^c} Var(D_i|\mathbf X^c) Pr(\mathbf X^c) }}_\text{weight}
 $$
 
-The weight of $\tau_\text{OLS}$ is clearly not equal to $\tau_\text{ATE}$. Thus, if there is any treatment heterogeneity, OLS will not estimate the ATE.
+The weight of $\uptau_\text{OLS}$ is clearly not equal to $\uptau_\text{ATE}$. Thus, if there is any treatment heterogeneity, OLS will not estimate the ATE.
 
 ## Solution to Regression Issues
 
@@ -78,7 +80,7 @@ We will focus on matching, the most common and intuitive method in modern causal
 ## Intuition of Matching
 
 $$
-\tau_i = Y_i(1)- Y_i(0)
+\uptau_i = Y_i(1)- Y_i(0)
 $$
 
 For treated individuals, $Y_i(0)$ is the unobserved counterfactual. Matching is about estimating $Y_i(0)$.
@@ -111,7 +113,7 @@ Propensity score matching is about matching units together that have similar lik
 This likelihood of being treated is called a **propensity score** $\pi$. They are estimated with a logistic regression:
 
 $$
-\log\left( \frac{\pi}{1-\pi}\right) = \beta_0 + \beta_1X_{i1} + \beta_2 X_{i2} + \dots + \beta_p X_{ip}
+\log\left( \frac{\pi}{1-\pi}\right) = \upbeta_0 + \upbeta_1X_{i1} + \upbeta_2 X_{i2} + \dots + \upbeta_p X_{ip}
 $$
 
 Then, we match treated to untreated units based on the closest propensity score estimates $\hat\pi$.
@@ -127,7 +129,7 @@ After all, once we are done with the matching process, we should have each treat
 We can then check if key confounder values between these two groups are similar using a regression:
 
 $$
-X_i = \beta_0 + \beta_1 D_i + \varepsilon_i
+X_i = \upbeta_0 + \upbeta_1 D_i + \upvarepsilon_i
 $$
 
 -   $\beta_1$ is the difference in $X_i$ value between treated and control groups. If it is insignificant, we can conclude the assumption is met.

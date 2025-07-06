@@ -6,6 +6,8 @@ format:
   beamer:
     slide-number: true
 header-includes: |
+  \usepackage{mathastext}
+  \usepackage{upgreek}
   \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
   \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
 editor: visual
@@ -15,7 +17,7 @@ editor: visual
 
 In Classical DiD, we have two time periods for units.
 
--    $t = -1$ (pre-treatment) and $t=0$ (post-treatment).
+-   $t = -1$ (pre-treatment) and $t=0$ (post-treatment).
 
 In Generalised DiD, we allow for more time periods.
 
@@ -150,78 +152,37 @@ This allows us to apply Generalised DiD to more situations than classical DiD.
 The estimator for Generalised DiD is the two-way fixed effects (TWFE) estimator. It is a linear regression:
 
 $$
-\hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + D_{it}\hat\tau_\text{ATT} + \mathbf X_{it}^\top \hat{\pmb\beta}
+Y_{it} = \hat{\upalpha}_i + \hat{\updelta}_t + D_{it}\hat{\uptau} + \mathbf X_{it}^\top \hat{\pmb\upbeta} + \hat{\upvarepsilon}_{it}
 $$
 
 -   $\mathbf X_{it}^\top$ are the values of the variables we are using to condition for parallel trends. This is optional (only use if parallel trends is not met without them).
 
--   $\hat\alpha_i$ and $\hat\gamma_t$ are unit and time fixed effects.
+-   $\hat{\upalpha}_i$ and $\hat{\updelta}_t$ are unit and time fixed effects.
 
-The estimated $\hat\tau_\text{ATT}$ from the regression is the overall causal estimate for all post-treatment periods. Standard errors should be clustered by units.
+The estimated $\hat{\uptau}$ from the regression is the overall causal estimate for all post-treatment periods. Standard errors should be clustered by units.
 
 ## What are Fixed Effects
 
-Unit fixed effects $\hat\alpha_i$ are intercepts in regression, like $\beta_0$. However, each unit $i$ gets its own intercept value.
+Unit fixed effects $\hat{\upalpha}_i$ are intercepts in regression, like $\upbeta_0$. However, each unit $i$ gets its own intercept value.
 
 -   These account for differences between units. Think of them as a control variable for units.
 
-Time fixed effects $\hat\gamma_t$ are the same, but for time periods $t$. These account for differences between time periods.
+Time fixed effects $\hat{\updelta}_t$ are the same, but for time periods $t$. These account for differences between time periods.
 
 The only remaining potential confounders is differences in trends over time between units. But if we meet the parallel trends assumption, this is also controlled for.
 
 Thus, all confounders are controlled for, and thus, treatment $D_{it}$ is exogenous. Thus, we can find the causal effect with TWFE.
-
-## TWFE In R
-
-TWFE in R is as follows:
-
-```{r}
-#| echo: true
-#| eval: false
-
-library(fixest)
-
-model <- feols(
-  fml  = Y ~ D + X1 + X2 | unit + time,
-  data = df,
-  vcov = ~unit
-)
-summary(model)
-```
-
--   X1 and X2 are confounders. If no confounders, just don't include any.
 
 ## TWFE for Dynamic Treatment Effects
 
 We can also use two-way fixed effects to estimate dynamic treatment effects (post-treatment) and pre-treatment estimates.
 
 $$
-\hat Y_{it} = \underbrace{\hat\alpha_i + \hat\gamma_t}_\text{fixed effects} + \sum_{r≠-1}I_{itr}G_i\hat\tau_r + \mathbf X_{it}^\top \hat{\pmb\beta}
+\hat Y_{itr} = \hat{\upalpha}_i + \hat{\updelta}_t + \sum_{r≠-1}1\{R_{itr} = r\} \cdot 1\{G_i = 1\} \cdot \hat{\uptau}_r + \hat{\upvarepsilon}_{it}
 $$
 
--   $r$ is the specific relative time period $R$ of the observation in question (see slide 3).
+-   The $\sum$ part basically says estimate a causal effect $\hat\tau_r$ for every relative time period $r$, except -1 (the last pre-treatment period, which is assumed to have 0 effect).
 
--   $I_{itr}$ is an indicator, that takes value $I=1$ if observation $it$ is in relative time period $R=r$, and $I=0$ otherwise. $G_i$ is a treatment/control group indicator.
+-   You can also include confounders in the regression.
 
--   The $\sum_r I_{itr}G_i$ basically says estimate a causal effect $\hat\tau_r$ for every relative time period $r$, except -1 (the last pre-treatment period).
-
-## Dynamic TWFE In R
-
-```{r}
-#| echo: true
-#| eval: false
-
-library(fixest)
-library(ggfixest)
-
-model <- feols(
-  fml  = Y ~ i(R, group, ref = -1) + X | unit + time,
-  data = df,
-  vcov = ~unit
-)
-ggiplot(model)
-```
-
--   R is the relative time period variable.
-
--   group is a binary variable. Individuals that receive treatment at any time (treatment group) get value 1, individuals that never receive treatment (control group) get value 0.
+The post-treatment $r ≥ 0$ effects can be used to estimate trends in causal effects, and the pre-treatment $r ≤ -1$ can be used to test parallel trends.

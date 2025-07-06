@@ -6,6 +6,8 @@ format:
   beamer:
     slide-number: true
 header-includes: |
+  \usepackage{mathastext}
+  \usepackage{upgreek}
   \setbeamertemplate{footline}[frame number]  % Forces slide numbers in footline
   \setbeamertemplate{navigation symbols}{}   % Optional: Removes navigation symbols
 editor: visual
@@ -45,7 +47,7 @@ We know that:
 These two hypothetical worlds are identical, except the treatment. Thus, any difference between the outcomes in these two worlds must be the **causal effect** for individual $i$.
 
 $$
-\tau_i = Y_i(1) - Y_i(0)
+\uptau_i = Y_i(1) - Y_i(0)
 $$
 
 We denote causal effects with the greek letter $\tau$ (tau).
@@ -66,7 +68,7 @@ The potential outcome $Y_i(1)$ or $Y_i(0)$ that we do not observe is called a **
 **Issue**: The causal effect requires we know/measure both potential outcomes:
 
 $$
-\tau_i = Y_i(1) - Y_i(0)
+\uptau_i = Y_i(1) - Y_i(0)
 $$
 
 The **fundamental** **problem of causal inference** is that we never observe both of these potential outcomes, meaning we cannot calculate the true treatment effect $\tau_i$.
@@ -90,11 +92,11 @@ Also - practicality aside, it just makes sense to look at group-level causal eff
 
 There are three causal estimands (effects we want to estimate) we are typically interested in:
 
-1.  Average Treatment Effect $\tau_\text{ATE}$. This is the average treatment effect $\mathbb E[\tau_i]$ for all individuals $i$.
+1.  Average Treatment Effect $\uptau_\text{ATE}$. This is the average treatment effect $\mathbb E[\uptau_i]$ for all individuals $i$.
 
-2.  Average Treatment Effect on the Treated $\tau_\text{ATT}$. This is the average treatment effect $\mathbb E[\tau_i | D_i = 1]$ for only individuals $i$ who actually receive the treatment in real life.
+2.  Average Treatment Effect on the Treated $\uptau_\text{ATT}$. This is the average treatment effect $\mathbb E[\uptau_i | D_i = 1]$ for only individuals $i$ who actually receive the treatment in real life.
 
-3.  Local/Conditional Average Treatment Effect $\tau_\text{LATE}$/$\tau_\text{CATE}$. This is the average treatment effect for only individuals $i$ who meet a set of criteria. For example, the treatment effect for only females in our study.
+3.  Local/Conditional Average Treatment Effect $\uptau_\text{LATE}$/$\uptau_\text{CATE}$. This is the average treatment effect for only individuals $i$ who meet a set of criteria. For example, the treatment effect for only females in our study.
 
 We will introduce strategies to estimate these values throughout the next few classes.
 
@@ -102,7 +104,7 @@ We will introduce strategies to estimate these values throughout the next few cl
 
 As we discussed in the regression review (and surely in past statistics classes), statistics is about using samples to estimate parameters in a population.
 
--   Ex. Regression uses sample to create estimates $\hat\beta$ of the true $\beta$ in the population.
+-   Ex. Regression uses sample to create estimates $\hat{\upbeta}$ of the true $\upbeta$ in the population.
 
 What is the sample and population in causal inference?
 
