@@ -89,17 +89,17 @@ One way to do this is to estimate the violations of parallel trends, and then co
 
 ## Interactive Fixed Effects (IFEct)
 
-Liu, Xu, and Wang propose a modified imputation estimator:
+Liu, Xu, and Wang propose a modified imputation model:
 
 $$
-\hat Y_{it}(0) = \hat{\upalpha}_i + \hat{\updelta}_t + \ \hat{\pmb\uplambda}_i^\top\hat{\mathbf f}_t
+Y_{it}(0) = {\upalpha}_i + {\updelta}_t + \pmb\uplambda_i^\top \mathbf f_t + \upepsilon_{it}
 $$
 
--   $\hat{\mathbf f}_t$ is a vector of time-varying latent (unobserved) variables that IFEct estimates.
+-   ${\mathbf f}_t$ is a vector of time-varying latent (unobserved) variables that IFEct estimates.
 
--   $\hat{\pmb\uplambda}_i$ is a vector of how each unit $i$ is affected by each of the time-varying latent variables.
+-   $\pmb\uplambda_i$ is a vector of how each unit $i$ is affected by each of the time-varying latent variables.
 
-**Summary**: This additional $\hat{\pmb\uplambda}_i^\top\hat{\mathbf f}_t$ allows IFEct to account for some differential trends between units (parallel trends violations). We still need parallel trends for IFEct - but the additional part makes it more likely we meet parallel trends.
+**Summary**: This additional $\pmb\uplambda_i^\top \mathbf f_t$ allows IFEct to account for some differential trends between units (parallel trends violations). We still need parallel trends for IFEct - but the additional part makes it more likely we meet parallel trends.
 
 ## Matrix Completion (MC)
 
